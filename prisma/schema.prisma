@@ -1,0 +1,176 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x"]
+  output        = "../models"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id                      String                   @id() @default(uuid())
+  username                String?
+  password                String?
+  name                    String?
+  family                  String?
+  fatherName              String?
+  permissionGroupId       access_permission_group? @relation(references: [id], fields: [accessPermissionGroupId])
+  creationTime            DateTime                 @default(now())
+  isDeleted               Boolean                  @default(false)
+  metaData                String?
+  creatorId               String?
+  accessPermissionGroupId String
+}
+
+model access_permission_group {
+  id          String   @id() @default(uuid())
+  title       String?
+  name        String
+  isDeletable Boolean
+  createDate  DateTime @default(now())
+  users       users[]
+}
+
+model access_permission_group_items {
+  id                             String   @id() @default(uuid())
+  userOrParentAccessPermissionId String?
+  providerKey                    String
+  creatorId                      String?
+  createDate                     DateTime @default(now())
+}
+
+model settings {
+  id            String   @id() @default(uuid())
+  providerKey   String
+  providerValue String
+  creatorId     String?
+  createDate    DateTime @default(now())
+}
+
+model ipgs {
+  id           String   @id() @default(uuid())
+  provider     String?
+  merchantId   String
+  terminalId   String
+  terminalKey  String
+  isActive     Boolean
+  creationTime DateTime @default(now())
+  creatorId    String?
+}
+
+model reuqestcodes {
+  id           String   @id() @default(uuid())
+  mobileNumber String
+  code         String
+  createDate   DateTime @default(now())
+}
+
+model baseData {
+  id             String   @id() @default(uuid())
+  providerKey    String
+  providerValue  String
+  providerData   String?
+  providerData_2 String?
+  createDate     DateTime @default(now())
+}
+
+model members {
+  id                    String   @id() @default(uuid())
+  name                  String?
+  family                String?
+  nationalCode          String?
+  fatherName            String?
+  disabilityStatus      Int?
+  disabilityDescription String?
+  partnerJob            String?
+  educationLevel        Int?
+  maritalStatus         Int?
+  childrenCounts        Int?
+  birthDate             String?
+  mobileNumber          String
+  address               String?
+  username              String?
+  password              String?
+  status                Int?
+  creationTime          DateTime @default(now())
+  creatorId             String?
+  isDeleted             Boolean  @default(false)
+}
+
+model members_product_items {
+  id             String  @id() @default(uuid())
+  parentMemberId String
+  title          String
+  ownProduct     Boolean
+}
+
+model imageSlider {
+  id           String   @id() @default(uuid())
+  fileId       String
+  title        String
+  creationTime DateTime @default(now())
+  creatorId    String?
+}
+
+model profileImageSlider {
+  id           String   @id() @default(uuid())
+  fileId       String
+  targetUrl    String?
+  creationTime DateTime @default(now())
+  creatorId    String?
+}
+
+model upload_document_template {
+  id              String   @id() @default(uuid())
+  title           String
+  maximumSizeInMb Int
+  isRequired      Boolean
+  showWhen        String?
+  creationTime    DateTime @default(now())
+  creatorId       String?
+}
+
+model uploadedDocuments {
+  id           String   @id() @default(uuid())
+  userId       String
+  templateId   String
+  filePath     String
+  creationTime DateTime @default(now())
+}
+
+model rejectionTemplates {
+  id           String   @id() @default(uuid())
+  title        String
+  creationTime DateTime @default(now())
+  creatorId    String?
+}
+
+model markets {
+  id                String   @id() @default(uuid())
+  title             String
+  activityStartDate DateTime
+  activityEndDate   DateTime
+  amount            Decimal
+  location          String
+}
+
+model market_desks {
+  id             String  @id() @default(uuid())
+  number         Int
+  title          String
+  amount         Decimal
+  parentMarketId String
+}
+
+model reversed_markets {
+  id          String  @id() @default(uuid())
+  marketId    String
+  deskId      String
+  userId      String
+  isPurchased Boolean
+}

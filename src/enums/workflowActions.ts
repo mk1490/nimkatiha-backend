@@ -1,0 +1,7 @@
+export enum WorkflowActions {
+    CREATE = 'CREATE',
+    UPDATE = 'UPDATE',
+    CHANGE_STATUS_ACCEPT_USER = 'CHANGE_STATUS_ACCEPT_USER',
+    UPDATE_TITLE = 'UPDATE_TITLE',
+    DELETE = 'DELETE',
+}
