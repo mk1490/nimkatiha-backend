@@ -110,6 +110,8 @@ model members {
   familyMembers                     Int?
   status                            Int?
   city                              String?
+  educational                       String?  @db.LongText
+  executiveHistory                  String?  @db.LongText
   creationTime                      DateTime @default(now())
   creatorId                         String?
   isDeleted                         Boolean  @default(false)

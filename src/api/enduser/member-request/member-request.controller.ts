@@ -82,6 +82,39 @@ export class MemberRequestController extends BaseController {
     });
   }
 
+  @Put('/educational')
+  async updateEducationalAndHistorical(
+    @CurrentMember() currentMember,
+    @Body() input) {
+
+
+    await this.prisma.members.update({
+      where: {
+        id: currentMember.id,
+      },
+      data: {
+        educational: JSON.stringify(input),
+      },
+    });
+  }
+
+
+  @Put('/executive')
+  async updateExecutive(
+    @CurrentMember() currentMember,
+    @Body() input) {
+
+
+    await this.prisma.members.update({
+      where: {
+        id: currentMember.id,
+      },
+      data: {
+        executiveHistory: JSON.stringify(input),
+      },
+    });
+  }
+
 
   @Get('/initialize/:step')
   async initialize(
