@@ -80,30 +80,39 @@ model baseData {
 }
 
 model members {
-  id                           String   @id() @default(uuid())
-  name                         String?
-  family                       String?
-  nationalCode                 String?
-  fatherName                   String?
-  disabilityStatus             Int?
-  disabilityDescription        String?
-  partnerJob                   String?
-  educationLevel               Int?
-  maritalStatus                Int?
-  religion                     String?
-  diseaseBackground            Int?
-  diseaseBackgroundDescription String?
-  childrenCounts               Int?
-  birthDate                    String?
-  mobileNumber                 String
-  address                      String?
-  username                     String?
-  password                     String?
-  status                       Int?
-  city                         String?
-  creationTime                 DateTime @default(now())
-  creatorId                    String?
-  isDeleted                    Boolean  @default(false)
+  id                                String   @id() @default(uuid())
+  name                              String?
+  family                            String?
+  nationalCode                      String?
+  disabilityStatus                  Int?
+  disabilityDescription             String?
+  partnerJob                        String?
+  educationLevel                    Int?
+  maritalStatus                     Int?
+  religion                          String?
+  diseaseBackground                 Int?
+  diseaseBackgroundDescription      String?
+  childrenCounts                    Int?
+  birthDate                         String?
+  mobileNumber                      String
+  address                           String?
+  username                          String?
+  password                          String?
+  fatherName                        String?
+  fatherFamily                      String?
+  fatherEducationLevel              Int?
+  fatherEducationLevelFifeSituation Int?
+  motherName                        String?
+  motherFamily                      String?
+  motherEducationLevel              Int?
+  motherEducationLevelFifeSituation Int?
+  singleChild                       Int?
+  familyMembers                     Int?
+  status                            Int?
+  city                              String?
+  creationTime                      DateTime @default(now())
+  creatorId                         String?
+  isDeleted                         Boolean  @default(false)
 }
 
 model members_product_items {

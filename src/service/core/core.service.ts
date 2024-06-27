@@ -37,6 +37,14 @@ export class CoreService extends BaseService {
     ];
   }
 
+  get lifeSituationItems() {
+    return [
+      { title: 'در قید حیات', value: 1 },
+      { title: 'فوت شده', value: 2 },
+    ];
+  }
+
+
 
   get maritalStatus() {
     return [

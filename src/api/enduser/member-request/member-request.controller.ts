@@ -13,6 +13,7 @@ import { UpdateProductItemDto } from './dto/update-product-item-dto';
 import { UpdateMarketSelectionDto } from './dto/update-market-selection-dto';
 import { MemberStatuses } from '../../../base/enums/memberStatuses';
 import { CoreService } from '../../../service/core/core.service';
+import { UpdateParentInformationDto } from './dto/update-parent-information-dto';
 
 @Controller('member-request')
 export class MemberRequestController extends BaseController {
@@ -56,34 +57,43 @@ export class MemberRequestController extends BaseController {
     });
   }
 
-
-  @Put('/product-items')
-  async updateProductItems(
+  @Put('/parent-information')
+  async updateParentInformation(
     @CurrentMember() currentMember,
-    @Body() input: UpdateProductItemDto) {
+    @Body() input: UpdateParentInformationDto) {
 
-    await this.prisma.members_product_items.deleteMany({
+
+    await this.prisma.members.update({
       where: {
-        parentMemberId: currentMember.id,
+        id: currentMember.id,
+      },
+      data: {
+        fatherFamily: input.fatherFamily,
+        fatherName: input.fatherName,
+        fatherEducationLevel: input.fatherEducationLevel,
+        fatherEducationLevelFifeSituation: input.fatherEducationLevelFifeSituation,
+        motherFamily: input.motherFamily,
+        motherName: input.motherName,
+        motherEducationLevel: input.motherEducationLevel,
+        motherEducationLevelFifeSituation: input.motherEducationLevelFifeSituation,
+        singleChild: input.singleChild,
+        familyMembers: Number(input.familyMembers),
       },
     });
-
-    await this.prisma.members_product_items.createMany({
-      data: input.items.map(f => {
-        return {
-          title: f.title,
-          ownProduct: f.ownProduct,
-          parentMemberId: currentMember.id,
-        };
-      }),
-    });
   }
+
 
   @Get('/initialize/:step')
   async initialize(
     @Param('step') currentStep,
     @CurrentMember() currentMember,
   ) {
+    const item = await this.prisma.members.findFirst({
+      where: {
+        id: currentMember.id,
+      },
+    });
+
     switch (currentStep) {
 
       case 'verifyPhoneNumber': {
@@ -93,11 +103,6 @@ export class MemberRequestController extends BaseController {
       }
 
       case 'general-information': {
-        const item = await this.prisma.members.findFirst({
-          where: {
-            id: currentMember.id,
-          },
-        });
 
 
         return {
@@ -130,6 +135,33 @@ export class MemberRequestController extends BaseController {
 
         };
       }
+
+      case 'parent-information': {
+        return {
+          initialize: {
+            educationLevels: this.coreService.educationLevels,
+            lifeSituationItems: this.coreService.lifeSituationItems,
+            singleChildItems: this.coreService.singleChildItems,
+          },
+          model: {
+            singleChild: item.singleChild,
+            familyMembers: item.familyMembers,
+            father: {
+              name: item.fatherName,
+              family: item.fatherFamily,
+              educationLevel: item.fatherEducationLevel,
+              lifeSituation: item.fatherEducationLevelFifeSituation,
+            },
+            mother: {
+              name: item.motherName,
+              family: item.motherFamily,
+              educationLevel: item.motherEducationLevel,
+              lifeSituation: item.motherEducationLevelFifeSituation,
+            },
+          },
+        };
+      }
+
       case 'uploaded-document': {
         const items = await this.prisma.upload_document_template.findMany({});
 
@@ -201,6 +233,9 @@ export class MemberRequestController extends BaseController {
           ...currentMember,
         };
       }
+        break;
+      default:
+        break;
     }
   }
 

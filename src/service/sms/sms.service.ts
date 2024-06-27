@@ -27,7 +27,7 @@ export class SmsService extends BaseService {
       'TemplateId': templateId,
     }, {
       headers: {
-        'x-api-key': 'mHBdmPanaFaOsDUvahSNHPArYIaFcpgqhfgOOOapCmdfqHbwuaBmU88OyylCuf5q',
+        'x-api-key': 'sa2ku1iAPoL5v7IlaqTwmJAEmpAI3yVltX95XBlGSAUpBodplsHw6tlldeyObL8p',
       },
       baseURL: 'https://api.sms.ir/v1',
     });
