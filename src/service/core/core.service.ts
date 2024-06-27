@@ -9,17 +9,17 @@ export class CoreService extends BaseService {
     if (cityTitle.length < 3)
       return [];
     return this.prisma.$queryRawUnsafe(`
-            select providerValue                                  cityId,
-                   providerData                                   cityTitle,
-                   providerData_2                                 provinceId,
-                   (select providerData
-                    from baseData bdp
-                    where bdp.providerKey = 'province'
-                      and bdp.providerValue = bdc.providerData_2) provinceTitle
-            from baseData bdc
-            where providerKey = 'city'
-              and providerData like N'%${cityTitle}%';
-        `);
+        select providerValue                                  cityId,
+               providerData                                   cityTitle,
+               providerData_2                                 provinceId,
+               (select providerData
+                from baseData bdp
+                where bdp.providerKey = 'province'
+                  and bdp.providerValue = bdc.providerData_2) provinceTitle
+        from baseData bdc
+        where providerKey = 'city'
+          and providerData like N'%${cityTitle}%';
+    `);
   }
 
 
@@ -53,6 +53,39 @@ export class CoreService extends BaseService {
       { title: 'سالم', value: 1 },
       { title: 'دارای معلولیت', value: 2 },
     ];
+  }
+
+
+  get diseaseBackgroundItems() {
+    return [
+      { title: 'دارای سابقه بیماری', value: 1 },
+      { title: 'بدون سابقه بیماری', value: 2 },
+    ];
+  }
+
+  get singleChildItems() {
+    return [
+      { title: 'تک فرزند می‌باشم', value: 1 },
+      { title: 'تک فرزند نمی‌باشم', value: 2 },
+    ];
+  }
+
+  get religionItems() {
+    return [
+      { title: 'شیعه', value: 'شیعه' },
+      { title: 'سنی', value: 'سنی' },
+      { title: 'سایر', value: -1 },
+    ];
+  }
+
+  async cityItems() {
+    const items = await this.prisma.cities.findMany();
+    return items.map(f => {
+      return {
+        title: f.title,
+        id: f.id,
+      };
+    });
   }
 
 

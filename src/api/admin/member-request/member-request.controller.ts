@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { MemberStatuses } from '../../../base/enums/memberStatuses';
 import { CoreService } from '../../../service/core/core.service';

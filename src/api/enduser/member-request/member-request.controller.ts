@@ -29,6 +29,8 @@ export class MemberRequestController extends BaseController {
   async updatePersonalInformation(
     @CurrentMember() currentMember,
     @Body() input: UpdatePersonalInformationDto) {
+
+
     await this.prisma.members.update({
       where: {
         id: currentMember.id,
@@ -46,6 +48,10 @@ export class MemberRequestController extends BaseController {
         partnerJob: input.partnerJob,
         address: input.address,
         childrenCounts: Number(input.childrenCounts),
+        diseaseBackground: Number(input.diseaseBackground),
+        diseaseBackgroundDescription: input.diseaseBackgroundDescription,
+        religion: input.religion,
+        city: input.city,
       },
     });
   }
@@ -92,6 +98,8 @@ export class MemberRequestController extends BaseController {
             id: currentMember.id,
           },
         });
+
+
         return {
           model: {
             name: item.name,
@@ -106,8 +114,20 @@ export class MemberRequestController extends BaseController {
             partnerJob: item.partnerJob,
             address: item.address,
             nationalCode: item.nationalCode,
+            religion: item.religion,
+            diseaseBackground: item.diseaseBackground,
+            diseaseBackgroundDescription: item.diseaseBackgroundDescription,
+            city: item.city,
+
           },
-          initialize: this.coreService.initializeItems,
+          initialize: {
+            educationLevels: this.coreService.educationLevels,
+            religionItems: this.coreService.religionItems,
+            disabilityStatus: this.coreService.disabilityStatus,
+            diseaseBackgroundItems: this.coreService.diseaseBackgroundItems,
+            cityItems: await this.coreService.cityItems(),
+          },
+
         };
       }
       case 'uploaded-document': {

@@ -40,4 +40,16 @@ export class UpdatePersonalInformationDto {
   @ApiProperty()
   address: string;
 
+  @ApiProperty()
+  diseaseBackground: number;
+
+  @ApiProperty()
+  diseaseBackgroundDescription: string;
+
+  @ApiProperty()
+  religion: string;
+
+  @ApiProperty()
+  city: string;
+
 }

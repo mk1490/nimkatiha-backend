@@ -10,13 +10,13 @@ export class SmsService extends BaseService {
   async sendOtpCode(phoneNumber, verifyCode) {
     // @ts-ignore
     if (!process.env.DEVELOPMENT_MODE || process.env.DEVELOPMENT_MODE != true) {
-      await this.sendSms(phoneNumber,
+   /*   await this.sendSms(phoneNumber,
         [
           {
             name: 'CODE', value: verifyCode,
           },
         ],
-        100000);
+        100000);*/
     }
   }
 
