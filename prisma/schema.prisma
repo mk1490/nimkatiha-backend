@@ -112,6 +112,8 @@ model members {
   city                              String?
   educational                       String?  @db.LongText
   executiveHistory                  String?  @db.LongText
+  educationalAndHistorical          String?  @db.LongText
+  educationalCourses                String?  @db.LongText
   creationTime                      DateTime @default(now())
   creatorId                         String?
   isDeleted                         Boolean  @default(false)

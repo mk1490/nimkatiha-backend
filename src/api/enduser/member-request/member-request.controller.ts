@@ -83,7 +83,7 @@ export class MemberRequestController extends BaseController {
   }
 
   @Put('/educational')
-  async updateEducationalAndHistorical(
+  async updateEducational(
     @CurrentMember() currentMember,
     @Body() input) {
 
@@ -111,6 +111,39 @@ export class MemberRequestController extends BaseController {
       },
       data: {
         executiveHistory: JSON.stringify(input),
+      },
+    });
+  }
+
+  @Put('/educationalAndHistorical')
+  async updateEducationalAndHistorical(
+    @CurrentMember() currentMember,
+    @Body() input) {
+
+
+    await this.prisma.members.update({
+      where: {
+        id: currentMember.id,
+      },
+      data: {
+        educationalAndHistorical: JSON.stringify(input),
+      },
+    });
+  }
+
+
+  @Put('/educational-courses')
+  async updateEducationalCourses(
+    @CurrentMember() currentMember,
+    @Body() input: UpdateMarketSelectionDto) {
+
+
+    await this.prisma.members.update({
+      where: {
+        id: currentMember.id,
+      },
+      data: {
+        educationalCourses: JSON.stringify(input),
       },
     });
   }
@@ -169,6 +202,7 @@ export class MemberRequestController extends BaseController {
         };
       }
 
+
       case 'parent-information': {
         return {
           initialize: {
@@ -194,79 +228,30 @@ export class MemberRequestController extends BaseController {
           },
         };
       }
-
-      case 'uploaded-document': {
-        const items = await this.prisma.upload_document_template.findMany({});
-
-        const finalItems = [];
-        items.map(item => {
-          const fileDir = join(global.directories.uploadedDocuments(currentMember.id), item.title + '.jpg');
-          let payload = {
-            id: item.id,
-            title: item.title,
-            isRequired: item.isRequired,
-            maximumSizeInMb: item.maximumSizeInMb,
-            image: existsSync(fileDir) ? `/api/public-files/uploaded-documents/${currentMember.id}/${item.title}.jpg` : null,
-          };
-          if (!item.showWhen) {
-            finalItems.push(payload);
-          } else {
-            if (currentMember.disabilityStatus === 2 && item.showWhen === 'hasDisable') {
-              finalItems.push(payload);
-            }
-          }
-        });
-        return finalItems;
-      }
-      case 'product-items': {
-        return await this.prisma.members_product_items.findMany({ where: { parentMemberId: currentMember.id } });
-      }
-      case 'market': {
-        const markets = await this.prisma.markets.findMany({
-          where: {},
-        });
-        let finalMarkets = markets.map(f => {
-          return {
-            value: f.id,
-            title: f.title,
-          };
-        });
-
-
-        const desks = await this.prisma.reversed_markets.findMany({
-          where: {
-            userId: currentMember.id,
-            isPurchased: false,
-          },
-        });
-        let marketItem;
-        if (desks.length > 0) {
-          marketItem = await this.prisma.markets.findFirst({
-            where: {
-              id: desks[0].marketId,
-            },
-          });
+      case 'educational-status' : {
+        if (item.educational) {
+          return JSON.parse(item.educational);
         }
-
-
-        return {
-          items: finalMarkets,
-          selectedMarketId: marketItem ? marketItem.id : null,
-          selectedMarketTitle: marketItem ? marketItem.title : null,
-          selectedDeskIds: desks.map((f) => {
-            return {
-              deskId: f.deskId,
-            };
-          }),
-        };
+        return null;
       }
-      case 'final-approve': {
-
-        return {
-          ...currentMember,
-        };
+      case 'executive' : {
+        if (item.executiveHistory) {
+          return JSON.parse(item.executiveHistory);
+        }
+        return null;
       }
-        break;
+      case 'educational-historical' : {
+        if (item.educationalAndHistorical) {
+          return JSON.parse(item.educationalAndHistorical);
+        }
+        return null;
+      }
+      case 'educational-courses' : {
+        if (item.educationalCourses) {
+          return JSON.parse(item.educationalCourses);
+        }
+        return null;
+      }
       default:
         break;
     }
