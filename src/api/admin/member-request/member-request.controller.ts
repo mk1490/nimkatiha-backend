@@ -52,13 +52,33 @@ export class MemberRequestController extends BaseController {
     const directory = global.directories.uploadedDocuments(item.id);
 
 
-    const filesInDirectory = readdirSync(directory);
+    // const filesInDirectory = readdirSync(directory);
 
-    filesInDirectory.map(f => {
-      uploadedDocuments.push({
-        title: f.replaceAll('.jpg', ''),
-        url: `/api/public-files/uploaded-documents/${item.id}/${f}`,
-      });
+    // filesInDirectory.map(f => {
+    //   uploadedDocuments.push({
+    //     title: f.replaceAll('.jpg', ''),
+    //     url: `/api/public-files/uploaded-documents/${item.id}/${f}`,
+    //   });
+    // });
+
+    let educational = { ...JSON.parse(item.educational) };
+    let executiveHistory = [...JSON.parse(item.executiveHistory)];
+
+    executiveHistory = executiveHistory.map(f => {
+      return {
+        title: f.title,
+        value: f.post + ', ' + f.postHistory,
+      };
+    });
+
+    let educationalAndHistorical = [...JSON.parse(item.educationalAndHistorical)];
+    let educationalCourses = { ...JSON.parse(item.educationalCourses) };
+
+    Object.keys(educationalCourses).map(f => {
+      let title = ''
+      const length = educationalCourses[f].length
+      educationalCourses[f].map((f, i) => title += f.title + (i ===  length - 1? '': ', '))
+      educationalCourses[f] = title;
     });
 
 
@@ -66,6 +86,10 @@ export class MemberRequestController extends BaseController {
       initialize: this.coreService.initializeItems,
       model: {
         ...item,
+        educational,
+        executiveHistory,
+        educationalAndHistorical,
+        educationalCourses,
         productItems: productItems,
         uploadedDocuments,
       },
