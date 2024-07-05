@@ -86,6 +86,30 @@ export class CoreService extends BaseService {
     ];
   }
 
+
+  get tarheVelayatItems(){
+    return [
+      {title: 'استانی', value: 1},
+      {title: 'حوزه‌ای', value: 2},
+    ]
+  }
+
+
+  get astaneQodsItems(){
+    return [
+      {title: 'بی‌نهایت شو', value: 1},
+      {title: 'برهان', value: 2},
+    ]
+  }
+  get oqafItems(){
+    return [
+      {title: 'ترتیل', value: 1},
+      {title: 'قرائت', value: 2},
+      {title: 'حفظ', value: 3}
+    ]
+  }
+
+
   async cityItems() {
     const items = await this.prisma.cities.findMany();
     return items.map(f => {
