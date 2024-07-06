@@ -144,7 +144,7 @@ export class MemberRequestController extends BaseController {
       },
       data: {
         educationalCourses: JSON.stringify(input),
-        status: MemberStatuses.WaitingForAccept
+        status: MemberStatuses.WaitingForAccept,
       },
     });
   }
@@ -248,17 +248,19 @@ export class MemberRequestController extends BaseController {
         return null;
       }
       case 'educational-courses' : {
+
+        let payload: any = {
+          initialize: {
+            tarheVelayat: this.coreService.tarheVelayatItems,
+            astaneQods: this.coreService.astaneQodsItems,
+            oqaf: this.coreService.oqafItems,
+          },
+
+        };
         if (item.educationalCourses) {
-          return {
-            initialize:{
-              tarheVelayat: this.coreService.tarheVelayatItems,
-              astaneQods: this.coreService.astaneQodsItems,
-              oqaf: this.coreService.oqafItems,
-            },
-            model: JSON.parse(item.educationalCourses)
-          };
+          payload.model = JSON.parse(item.educationalCourses);
         }
-        return null;
+        return payload;
       }
       default:
         break;
