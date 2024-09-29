@@ -155,6 +155,7 @@ export class MemberRequestController extends BaseController {
     @Param('step') currentStep,
     @CurrentMember() currentMember,
   ) {
+
     const item = await this.prisma.members.findFirst({
       where: {
         id: currentMember.id,
