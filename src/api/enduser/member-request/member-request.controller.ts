@@ -231,10 +231,12 @@ export class MemberRequestController extends BaseController {
         };
       }
       case 'educational-status' : {
-        if (item.educational) {
-          return JSON.parse(item.educational);
-        }
-        return null;
+        return {
+          items: {
+            cities: await this.coreService.cityItems(),
+          },
+          model: item.educational ? JSON.parse(item.educational) : null,
+        };
       }
       case 'executive' : {
         if (item.executiveHistory) {
@@ -246,6 +248,7 @@ export class MemberRequestController extends BaseController {
         if (item.educationalAndHistorical) {
           return JSON.parse(item.educationalAndHistorical);
         }
+
         return null;
       }
       case 'educational-courses' : {
