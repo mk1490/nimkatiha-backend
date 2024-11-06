@@ -9,7 +9,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
+  url      = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
 }
 
 model users {
@@ -200,4 +201,16 @@ model cities {
   latitude   Decimal
   longitude  Decimal
   createDate DateTime @default(now())
+}
+
+model test_templates {
+  id    String @id() @default(uuid())
+  title String
+  slug  String
+}
+
+model test_template_disabled_form {
+  id       String @id() @default(uuid())
+  parentId String
+  key String
 }

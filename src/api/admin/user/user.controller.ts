@@ -30,7 +30,7 @@ export class UserController extends BaseController {
 
   @Get('/initialize')
   @ApiBearerAuth()
-  @Roles('users.create', 'users.update', 'users.delete', 'users.change_password')
+  // @Roles('users.create', 'users.update', 'users.delete', 'users.change_password')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async _initialize(
     @Query('userId') userId: string) {
@@ -47,7 +47,7 @@ export class UserController extends BaseController {
 
   @Get('/list')
   @ApiBearerAuth()
-  @Roles('users.create', 'users.update', 'users.delete', 'users.change_password')
+  // @Roles('users.create', 'users.update', 'users.delete', 'users.change_password')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async getList() {
     const accessPermissionItem = await this.prisma.access_permission_group.findFirst({
