@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateTestTemplateDto } from './dto/create-update-test-template-dto';
 
@@ -9,11 +9,33 @@ export class TestTemplateController extends BaseController {
     super();
   }
 
-  @Get('list')
+  @Get('/list')
   async getList() {
     return await this.prisma.test_templates.findMany();
   }
 
+  @Get('/:id')
+  async getDetails(@Param('id') id) {
+    const item = await this.prisma.test_templates.findFirst({
+      where: {
+        id,
+      },
+    });
+
+
+    const disabledForm = await this.prisma.test_template_disabled_form.findMany({
+      where: {
+        parentId: item.id,
+      },
+    });
+
+    return {
+      ...item,
+      disabledForm: disabledForm.map(f => {
+        return f.key;
+      }),
+    };
+  }
 
   @Post()
   async create(@Body() input: CreateUpdateTestTemplateDto) {

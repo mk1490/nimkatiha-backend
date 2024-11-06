@@ -15,80 +15,14 @@ export class AccessPermissionService extends BaseService {
                     this.defineAccessPermissionObject('اضافه نمودن', `${key}.home_sliders_management.create`, []),
                     this.defineAccessPermissionObject('بروزرسانی عنوان', `${key}.home_sliders_management.update_title`, []),
                     this.defineAccessPermissionObject('حذف', `${key}.home_sliders_management.delete`, []),
-                ]));
+                ]))
                 company_intro.push(this.defineAccessPermissionObject('مدیریت اسلایدر صفحه پروفایل', `${key}.profile_sliders_management`, [
                     this.defineAccessPermissionObject('اضافه نمودن', `${key}.profile_sliders_management.create`, []),
                     this.defineAccessPermissionObject('بروزرسانی آدرس Url', `${key}.profile_sliders_management.update_url`, []),
                     this.defineAccessPermissionObject('حذف', `${key}.profile_sliders_management.delete`, []),
                 ]));
 
-                company_intro.push(this.defineAccessPermissionObject('مدیریت عنوان و توضیحات معرّفی شرکت', `${key}.company_intro`, []));
-
-
-                company_intro.push(this.defineAccessPermissionObject('مدیریت پروژه‌های انجام شده', `${key}.some_projects`, [
-                    this.defineAccessPermissionObject('افزودن', `${key}.some_projects.create`, []),
-                    this.defineAccessPermissionObject('بروزرسانی عنوان و توضیحات', `${key}.some_projects.update`, []),
-                    this.defineAccessPermissionObject('حذف', `${key}.some_projects.delete`, []),
-                ]));
-
-                company_intro.push(this.defineAccessPermissionObject('مدیریت اعلانات شرکت', `${key}.company_notification`, [
-                    this.defineAccessPermissionObject('افزودن', `${key}.company_notification.create`, []),
-                    this.defineAccessPermissionObject('بروزرسانی عنوان و توضیحات', `${key}.company_notification.update`, []),
-                    this.defineAccessPermissionObject('حذف', `${key}.company_notification.delete`, []),
-                ]));
-                company_intro.push(this.defineAccessPermissionObject('رتبه بندی مشتریان', `${key}.ranking`, []));
-
-
                 root.push(this.defineAccessPermissionObject('معرّفی شرکت', key, company_intro));
-            }
-            {
-                const key = 'projects'
-                root.push(this.defineAccessPermissionObject('مدیریت پروژه‌ها', `${key}`, [
-                    this.defineAccessPermissionObject('افزودن', `${key}.create`, []),
-                    this.defineAccessPermissionObject('بروزرسانی و ویرایش مشخّصات', `${key}.update`, []),
-                    this.defineAccessPermissionObject('حذف', `${key}.delete`, []),
-                    this.defineAccessPermissionObject('مدیریت بلوک‌های زیرمجموعه', `${key}.project_blocks`, [
-                        this.defineAccessPermissionObject('افزودن', `${key}.project_blocks.create`, []),
-                        this.defineAccessPermissionObject('بروزرسانی و ویرایش مشخّصات', `${key}.project_blocks.update`, []),
-                        this.defineAccessPermissionObject('حذف', `${key}.project_blocks.delete`, []),
-                    ]),
-                    this.defineAccessPermissionObject('مدیریت طبقات بلوک', `${key}.project_blocks_floor`, [
-                        this.defineAccessPermissionObject('افزودن', `${key}.project_blocks_floor.create`, []),
-                        this.defineAccessPermissionObject('بروزرسانی و ویرایش مشخّصات', `${key}.project_blocks_floor.update`, []),
-                        this.defineAccessPermissionObject('حذف', `${key}.project_blocks_floor.delete`, []),
-                    ]),
-                ]))
-            }
-
-
-            {
-                let settings: any = [];
-                {
-                    const key = 'users';
-                    settings.push(this.defineAccessPermissionObject('مدیریت کاربران', key, [
-                        this.defineAccessPermissionObject('افزودن', `${key}.create`, []),
-                        this.defineAccessPermissionObject('بروزرسانی', `${key}.update`, []),
-                        this.defineAccessPermissionObject('تغییر کلمۀ عبور', `${key}.change_password`, []),
-                        this.defineAccessPermissionObject('حذف', `${key}.delete`, [])
-                    ]));
-                }
-                {
-                    const key = 'access_permissions';
-                    settings.push(this.defineAccessPermissionObject('مدیریت گروه کاربری', key, [
-                        this.defineAccessPermissionObject('افزودن', `${key}.create`, []),
-                        this.defineAccessPermissionObject('بروزرسانی', `${key}.update`, []),
-                        this.defineAccessPermissionObject('حذف', `${key}.delete`, [])
-                    ]));
-                }
-                {
-                    const key = 'ipg_management';
-                    settings.push(this.defineAccessPermissionObject('مدیریت درگاه‌های پرداخت', key, [
-                        this.defineAccessPermissionObject('افزودن', `${key}.create`, []),
-                        this.defineAccessPermissionObject('بروزرسانی', `${key}.update`, []),
-                        this.defineAccessPermissionObject('حذف', `${key}.delete`, [])
-                    ]));
-                }
-                root.push(this.defineAccessPermissionObject('تنظیمات', `settings`, settings))
             }
         }
         return root;

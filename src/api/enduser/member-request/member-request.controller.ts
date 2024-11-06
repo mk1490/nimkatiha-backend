@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotAcceptableException,
+  Param,
+  Post,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { UpdatePersonalInformationDto } from './dto/update-personal-information-dto';
 import { CurrentUser } from '../../../base/decorators/current-user.decorator';
@@ -149,9 +159,10 @@ export class MemberRequestController extends BaseController {
   }
 
 
-  @Get('/initialize/:step')
+  @Get('/initialize/:step/:slug')
   async initialize(
     @Param('step') currentStep,
+    @Param('slug') slug,
     @CurrentMember() currentMember,
   ) {
     const item = await this.prisma.members.findFirst({
@@ -159,6 +170,25 @@ export class MemberRequestController extends BaseController {
         id: currentMember.id,
       },
     });
+
+
+    const testTemplateItem = await this.prisma.test_templates.findFirst({
+      where: {
+        slug: slug,
+      },
+    });
+
+
+    if (!testTemplateItem)
+      throw new NotAcceptableException();
+
+
+    const testTemplateDisabledForm = await this.prisma.test_template_disabled_form.findMany({
+      where: {
+        parentId: testTemplateItem.id,
+      },
+    });
+
 
     switch (currentStep) {
 
@@ -189,7 +219,6 @@ export class MemberRequestController extends BaseController {
             diseaseBackground: item.diseaseBackground,
             diseaseBackgroundDescription: item.diseaseBackgroundDescription,
             city: item.city,
-
           },
           initialize: {
             educationLevels: this.coreService.educationLevels,
@@ -198,6 +227,9 @@ export class MemberRequestController extends BaseController {
             diseaseBackgroundItems: this.coreService.diseaseBackgroundItems,
             cityItems: await this.coreService.cityItems(),
           },
+          disabledForms: testTemplateDisabledForm.map(f => {
+            return f.key;
+          }),
 
         };
       }

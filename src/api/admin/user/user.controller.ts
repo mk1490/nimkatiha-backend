@@ -17,6 +17,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../../auth/roles.decorator';
 import { JwtAuthGuard } from '../../auth/jwt-auth-guard';
 import { RolesGuard } from '../../auth/roles-guard';
+import { AccessPermissionService } from '../../../service/access-permission/access-permission.service';
 
 @Controller('user')
 export class UserController extends BaseController {
@@ -35,12 +36,7 @@ export class UserController extends BaseController {
   async _initialize(
     @Query('userId') userId: string) {
     return {
-      permissionGroupItems: await this.prisma.accessPermissionGroup.findMany({
-        select: {
-          id: true,
-          title: true,
-        },
-      }),
+      accessPermissionRuleItems: await this.accessPermissionService.getListOfPermissions(),
     };
   }
 
