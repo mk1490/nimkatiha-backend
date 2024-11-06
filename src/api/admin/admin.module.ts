@@ -18,7 +18,7 @@ import { MarketController } from './market/market.controller';
 import { MarketDeskController } from './market-desk/market-desk.controller';
 import { MemberRequestController } from './member-request/member-request.controller';
 import { CoreService } from '../../service/core/core.service';
-import { TestTemplateController } from './test-template/test-template.controller';
+import { MemberController } from './member/member.controller';
 
 @Module({
   controllers: [
@@ -34,7 +34,7 @@ import { TestTemplateController } from './test-template/test-template.controller
     MarketController,
     MarketDeskController,
     MemberRequestController,
-    TestTemplateController,
+    MemberController,
   ],
   providers: [
     AccessPermissionService,

@@ -154,6 +154,7 @@ export class MemberRequestController extends BaseController {
       },
       data: {
         educationalCourses: JSON.stringify(input),
+        status: MemberStatuses.WaitingForAccept,
       },
     });
   }
@@ -165,6 +166,7 @@ export class MemberRequestController extends BaseController {
     @Param('slug') slug,
     @CurrentMember() currentMember,
   ) {
+
     const item = await this.prisma.members.findFirst({
       where: {
         id: currentMember.id,
@@ -261,10 +263,12 @@ export class MemberRequestController extends BaseController {
         };
       }
       case 'educational-status' : {
-        if (item.educational) {
-          return JSON.parse(item.educational);
-        }
-        return null;
+        return {
+          items: {
+            cities: await this.coreService.cityItems(),
+          },
+          model: item.educational ? JSON.parse(item.educational) : null,
+        };
       }
       case 'executive' : {
         if (item.executiveHistory) {
@@ -276,13 +280,23 @@ export class MemberRequestController extends BaseController {
         if (item.educationalAndHistorical) {
           return JSON.parse(item.educationalAndHistorical);
         }
+
         return null;
       }
       case 'educational-courses' : {
+
+        let payload: any = {
+          initialize: {
+            tarheVelayat: this.coreService.tarheVelayatItems,
+            astaneQods: this.coreService.astaneQodsItems,
+            oqaf: this.coreService.oqafItems,
+          },
+
+        };
         if (item.educationalCourses) {
-          return JSON.parse(item.educationalCourses);
+          payload.model = JSON.parse(item.educationalCourses);
         }
-        return null;
+        return payload;
       }
       default:
         break;

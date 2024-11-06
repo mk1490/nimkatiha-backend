@@ -75,10 +75,36 @@ export class MemberRequestController extends BaseController {
     let educationalCourses = { ...JSON.parse(item.educationalCourses) };
 
     Object.keys(educationalCourses).map(f => {
-      let title = ''
-      const length = educationalCourses[f].length
-      educationalCourses[f].map((f, i) => title += f.title + (i ===  length - 1? '': ', '))
-      educationalCourses[f] = title;
+      let value = educationalCourses[f];
+
+      if (value) {
+        switch (f) {
+          case 'tarheVelayat': {
+            let item = this.coreService.tarheVelayatItems.find(x => x.value === value);
+            if (item) {
+              value = item.title;
+            }
+            break;
+          }
+          case 'astaneQods':{
+            let title = ''
+            value = value.map((f, i )=>{
+              title += this.coreService.astaneQodsItems.find(x=> x.value === f).title  + (i > 0 ? ', ' : '')
+            })
+            value = title;
+            break;
+          }
+          case 'oqaf':{
+            let title = ''
+            value.map((f, i )=>{
+              title += this.coreService.oqafItems.find(x=> x.value === f).title + (i >= 0 ? ', ' : '')
+            })
+            value = title;
+            break;
+          }
+        }
+      }
+      educationalCourses[f] = value;
     });
 
 

@@ -63,7 +63,7 @@ export class UserController extends BaseController {
 
   @Get('/:id')
   @ApiBearerAuth()
-  @Roles('users.update')
+  // @Roles('users.update')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async getById(
     @Param('id') id: string) {
@@ -92,7 +92,7 @@ export class UserController extends BaseController {
 
   @Post()
   @ApiBearerAuth()
-  @Roles('users.create')
+  // @Roles('users.create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async create(
     @Body() input: CreateUpdateUserDto,
@@ -123,7 +123,7 @@ export class UserController extends BaseController {
 
   @Put('/change-password')
   @ApiBearerAuth()
-  @Roles('users.change_password')
+  // @Roles('users.change_password')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async changePassword(@Body() input: UpdatePasswordDto) {
 
@@ -149,7 +149,7 @@ export class UserController extends BaseController {
 
   @Put('/:id')
   @ApiBearerAuth()
-  @Roles('users.update')
+  // @Roles('users.update')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async update(
     @Param('id') id,
@@ -195,7 +195,7 @@ export class UserController extends BaseController {
 
   @Delete('/:id')
   @ApiBearerAuth()
-  @Roles('users.delete')
+  // @Roles('users.delete')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async delete(@Param('id') id) {
     await this.prisma.users.update({
