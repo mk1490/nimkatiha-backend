@@ -116,6 +116,7 @@ model members {
   educationalAndHistorical          String?  @db.LongText
   educationalCourses                String?  @db.LongText
   creationTime                      DateTime @default(now())
+  questionnaireId                   String?
   creatorId                         String?
   isDeleted                         Boolean  @default(false)
 }
@@ -212,5 +213,5 @@ model test_templates {
 model test_template_disabled_form {
   id       String @id() @default(uuid())
   parentId String
-  key String
+  key      String
 }

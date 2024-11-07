@@ -1,9 +1,10 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { MemberStatuses } from '../../../base/enums/memberStatuses';
 import { CoreService } from '../../../service/core/core.service';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 import { readdirSync } from 'fs';
+import * as test from 'node:test';
 
 @Controller('member-request')
 export class MemberRequestController extends BaseController {
@@ -15,20 +16,39 @@ export class MemberRequestController extends BaseController {
   }
 
 
-  @Get('list')
-  async getList() {
-
-
+  @Post('/list')
+  async getList(@Body() input) {
     const items = await this.prisma.members.findMany({
       where: {
         status: MemberStatuses.WaitingForAccept,
+        questionnaireId: input.tests.length > 0 ? {
+          in: input.tests,
+        } : undefined,
       },
     });
-    return items;
+
+    const testItems = await this.prisma.test_templates.findMany();
+
+    return {
+      initialize: {
+        filter: {
+          tests: testItems.map(f => {
+            return {
+              title: f.title,
+              id: f.id,
+            };
+          }),
+        },
+      },
+      items: items.map(f => {
+        const testItem = testItems.find(x => x.id == f.questionnaireId);
+        return f['questionnaireTitle'] = testItem ? testItem.title : '';
+      }),
+    };
 
   }
 
-  @Get(':id')
+  @Get('/:id')
   async getDetails(
     @Param('id') id: string) {
     const item = await this.prisma.members.findFirst({
@@ -36,16 +56,6 @@ export class MemberRequestController extends BaseController {
         id: id,
       },
     });
-    const productItems = await this.prisma.members_product_items.findMany({
-      where: {
-        parentMemberId: item.id,
-      },
-      select: {
-        title: true,
-        ownProduct: true,
-      },
-    });
-
     let uploadedDocuments = [];
 
 
@@ -86,19 +96,19 @@ export class MemberRequestController extends BaseController {
             }
             break;
           }
-          case 'astaneQods':{
-            let title = ''
-            value = value.map((f, i )=>{
-              title += this.coreService.astaneQodsItems.find(x=> x.value === f).title  + (i > 0 ? ', ' : '')
-            })
+          case 'astaneQods': {
+            let title = '';
+            value = value.map((f, i) => {
+              title += this.coreService.astaneQodsItems.find(x => x.value === f).title + (i > 0 ? ', ' : '');
+            });
             value = title;
             break;
           }
-          case 'oqaf':{
-            let title = ''
-            value.map((f, i )=>{
-              title += this.coreService.oqafItems.find(x=> x.value === f).title + (i >= 0 ? ', ' : '')
-            })
+          case 'oqaf': {
+            let title = '';
+            value.map((f, i) => {
+              title += this.coreService.oqafItems.find(x => x.value === f).title + (i >= 0 ? ', ' : '');
+            });
             value = title;
             break;
           }
@@ -116,7 +126,6 @@ export class MemberRequestController extends BaseController {
         executiveHistory,
         educationalAndHistorical,
         educationalCourses,
-        productItems: productItems,
         uploadedDocuments,
       },
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateTestTemplateDto } from './dto/create-update-test-template-dto';
 
@@ -64,6 +64,69 @@ export class TestTemplateController extends BaseController {
     }));
 
     await this.prisma.$transaction(transaction);
+
+
+    return this.prisma.test_templates.findFirst({
+      where: {
+        id,
+      },
+    });
+  }
+
+
+  @Put('/:id')
+  async update(
+    @Param('id') id,
+    @Body() input: CreateUpdateTestTemplateDto) {
+    const transaction = [];
+
+
+    const item = await this.prisma.test_templates.findFirst({
+      where: {
+        id,
+      },
+    });
+
+
+    if (input.keys.length > 0) {
+
+      transaction.push(this.prisma.test_template_disabled_form.deleteMany({
+        where: {
+          parentId: item.id,
+        },
+      }));
+
+      transaction.push(this.prisma.test_template_disabled_form.createMany({
+        data: input.keys.map(f => {
+          return {
+            parentId: id,
+            key: f,
+          };
+        }),
+      }));
+    }
+
+
+    transaction.push(this.prisma.test_templates.update({
+      data: {
+        title: input.title,
+        slug: input.slug,
+      },
+      where: {
+        id: item.id,
+      },
+    }));
+
+
+    await this.prisma.$transaction(transaction);
+
+
+    return this.prisma.test_templates.findFirst({
+      where: {
+        id: item.id,
+      },
+    });
+
   }
 
 }
