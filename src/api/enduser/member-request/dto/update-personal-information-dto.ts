@@ -52,4 +52,7 @@ export class UpdatePersonalInformationDto {
   @ApiProperty()
   city: string;
 
+  @ApiProperty()
+  slug: string;
+
 }

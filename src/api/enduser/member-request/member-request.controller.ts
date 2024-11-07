@@ -42,6 +42,12 @@ export class MemberRequestController extends BaseController {
     @Body() input: UpdatePersonalInformationDto) {
 
 
+    const testItem = await this.prisma.test_templates.findFirst({
+      where: {
+        slug: input.slug,
+      },
+    });
+
     await this.prisma.members.update({
       where: {
         id: currentMember.id,
@@ -63,6 +69,7 @@ export class MemberRequestController extends BaseController {
         diseaseBackgroundDescription: input.diseaseBackgroundDescription,
         religion: input.religion,
         city: input.city,
+        questionnaireId: testItem.id,
       },
     });
   }
