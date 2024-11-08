@@ -19,6 +19,13 @@ export class MemberRequestController extends BaseController {
   @Post('/list')
   async getList(@Body() input) {
     const items = await this.prisma.members.findMany({
+      select: {
+        name: true,
+        family: true,
+        fatherName: true,
+        creationTime: true,
+        questionnaireId: true,
+      },
       where: {
         status: MemberStatuses.WaitingForAccept,
         questionnaireId: input.tests.length > 0 ? {
@@ -46,8 +53,46 @@ export class MemberRequestController extends BaseController {
         return f;
       }),
     };
-
   }
+
+
+  @Get('/download-excel-list')
+  async downloadExcelList(@Query('questionnaireId') questionnaireId) {
+
+
+    const educationLevels = this.coreService.educationLevels;
+    const items = await this.prisma.members.findMany({
+      where: {
+        questionnaireId: questionnaireId,
+      },
+    });
+
+
+
+    const finalItems =  items.map(f => {
+      f.educational = JSON.parse(f.educational);
+      f.educationalCourses = JSON.parse(f.educationalCourses);
+      f.educationalAndHistorical = JSON.parse(f.educationalAndHistorical);
+      f.executiveHistory = JSON.parse(f.executiveHistory);
+
+
+
+      delete f.password;
+      return f;
+    });
+
+
+    return {
+
+      initialize:{
+        educationLevels: this.coreService.educationLevels,
+        lifeSituationItems: this.coreService.lifeSituationItems,
+        singleChildItems: this.coreService.singleChildItems,
+      },
+      items: finalItems
+    }
+  }
+
 
   @Get('/:id')
   async getDetails(
