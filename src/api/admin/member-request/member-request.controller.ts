@@ -42,7 +42,8 @@ export class MemberRequestController extends BaseController {
       },
       items: items.map(f => {
         const testItem = testItems.find(x => x.id == f.questionnaireId);
-        return f['questionnaireTitle'] = testItem ? testItem.title : '';
+        f['questionnaireTitle'] = testItem ? testItem.title : '';
+        return f;
       }),
     };
 

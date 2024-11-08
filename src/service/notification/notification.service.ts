@@ -62,7 +62,6 @@ export class NotificationService extends BaseService {
 
         function getNotifications(filterKey) {
             if (Array.isArray(filterKey)) {
-                console.log(filterKey)
                 return notifications.filter(notificationItem => filterKey.map(x => x == notificationItem.cratedFor)).length
             } else {
                 return notifications.filter(x => x.cratedFor == filterKey).length

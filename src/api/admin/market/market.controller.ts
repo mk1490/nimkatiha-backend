@@ -50,7 +50,6 @@ export class MarketController extends BaseController {
                (select count(*) from market_desks md where md.parentMarketId = m.id) desksCount
         from markets m
     `);
-    console.log(items);
     return items.map(f => {
       f.desksCount = Number(f.desksCount);
       return f;

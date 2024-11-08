@@ -64,7 +64,7 @@ model ipgs {
   creatorId    String?
 }
 
-model reuqestcodes {
+model request_codes {
   id           String   @id() @default(uuid())
   mobileNumber String
   code         String

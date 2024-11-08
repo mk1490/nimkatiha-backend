@@ -5,7 +5,7 @@ import {
   NotAcceptableException,
   Param,
   Post,
-  Put,
+  Put, Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -167,10 +167,10 @@ export class MemberRequestController extends BaseController {
   }
 
 
-  @Get('/initialize/:step/:slug')
+  @Get('/initialize/:step')
   async initialize(
     @Param('step') currentStep,
-    @Param('slug') slug,
+    @Query('questionnaireId') questionnaireId,
     @CurrentMember() currentMember,
   ) {
 
@@ -183,7 +183,7 @@ export class MemberRequestController extends BaseController {
 
     const testTemplateItem = await this.prisma.test_templates.findFirst({
       where: {
-        slug: slug,
+        id: questionnaireId,
       },
     });
 

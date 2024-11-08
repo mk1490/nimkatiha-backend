@@ -25,7 +25,6 @@ export const CurrentUser = createParamDecorator(async (name: string, ctx: Execut
                 id: jwtUser.sub
             }
         });
-        console.log(jwtUser, userItem)
         if (!userItem)
             return null;
         const userType = await usersService.getUserTypeKeyByUserItem(userItem.accessPermissionGroupId);

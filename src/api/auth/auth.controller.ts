@@ -44,7 +44,7 @@ export class AuthController extends BaseController {
   @Post('/checkMobileNumber')
   async checkMobileNumber(@Body() input: CheckMobileNumberDto) {
     const mobileNumber = input.mobileNumber;
-    const checkIsCodeExists = await this.prisma.reuqestcodes.findMany({
+    const checkIsCodeExists = await this.prisma.request_codes.findMany({
       where: {
         mobileNumber: mobileNumber,
       },
@@ -69,7 +69,7 @@ export class AuthController extends BaseController {
       console.log(e);
     }
 
-    await this.prisma.reuqestcodes.create({
+    await this.prisma.request_codes.create({
       data: {
         mobileNumber: mobileNumber,
         code: randomNumber,
@@ -97,11 +97,7 @@ export class AuthController extends BaseController {
 
   @Post('/login')
   async login(@Body() input: LoginDto, @Headers('origin') origin) {
-    const adminOrigins = ['http://admin.petus-co.ir', 'http://localhost:8080'];
-    let isAdmin = false;
-    if (adminOrigins.includes(origin)) {
-      isAdmin = true;
-    }
+    let isAdmin = true;
     return await this.authService.login(input, isAdmin);
   }
 
@@ -186,7 +182,7 @@ export class AuthController extends BaseController {
   }
 
   private async checkVerifyCode(mobileNumber, verifyCode) {
-    const verifyCodeItem = await this.prisma.reuqestcodes.findFirst({
+    const verifyCodeItem = await this.prisma.request_codes.findFirst({
       where: {
         mobileNumber: mobileNumber,
         code: verifyCode,
