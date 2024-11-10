@@ -20,6 +20,7 @@ export class MemberRequestController extends BaseController {
   async getList(@Body() input) {
     const items = await this.prisma.members.findMany({
       select: {
+        id: true,
         name: true,
         family: true,
         fatherName: true,
@@ -68,13 +69,11 @@ export class MemberRequestController extends BaseController {
     });
 
 
-
-    const finalItems =  items.map(f => {
+    const finalItems = items.map(f => {
       f.educational = JSON.parse(f.educational);
       f.educationalCourses = JSON.parse(f.educationalCourses);
       f.educationalAndHistorical = JSON.parse(f.educationalAndHistorical);
       f.executiveHistory = JSON.parse(f.executiveHistory);
-
 
 
       delete f.password;
@@ -84,13 +83,13 @@ export class MemberRequestController extends BaseController {
 
     return {
 
-      initialize:{
+      initialize: {
         educationLevels: this.coreService.educationLevels,
         lifeSituationItems: this.coreService.lifeSituationItems,
         singleChildItems: this.coreService.singleChildItems,
       },
-      items: finalItems
-    }
+      items: finalItems,
+    };
   }
 
 
