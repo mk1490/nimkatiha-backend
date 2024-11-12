@@ -82,12 +82,7 @@ export class MemberRequestController extends BaseController {
 
 
     return {
-
-      initialize: {
-        educationLevels: this.coreService.educationLevels,
-        lifeSituationItems: this.coreService.lifeSituationItems,
-        singleChildItems: this.coreService.singleChildItems,
-      },
+      initialize: this.coreService.initializeItems,
       items: finalItems,
     };
   }

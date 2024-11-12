@@ -9,6 +9,7 @@ import { AccessPermissionService } from '../../service/access-permission/access-
 import { UsersService } from '../../service/users/users.service';
 import { MemberRequestController } from './member-request/member-request.controller';
 import { CoreService } from '../../service/core/core.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [CoreController, AuthController, MemberRequestController],
@@ -20,6 +21,7 @@ import { CoreService } from '../../service/core/core.service';
     AccessPermissionService,
     UsersService,
     CoreService,
+    JwtService,
   ],
 })
 
