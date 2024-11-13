@@ -22,22 +22,6 @@ export class MemberRequestController extends BaseController {
   async getList(
     @CurrentUser() currentUser: CurrentUserModel,
     @Body() input) {
-    const items = await this.prisma.members.findMany({
-      select: {
-        id: true,
-        name: true,
-        family: true,
-        fatherName: true,
-        creationTime: true,
-        questionnaireId: true,
-      },
-      where: {
-        status: MemberStatuses.WaitingForAccept,
-        questionnaireId: input.tests.length > 0 ? {
-          in: input.tests,
-        } : undefined,
-      },
-    });
 
 
     const user_available_questionnairies = await this.prisma.user_available_questionnairies.findMany({
@@ -53,6 +37,33 @@ export class MemberRequestController extends BaseController {
         },
       },
     });
+
+    let whereFilter: any = {};
+
+
+    whereFilter = {
+      status: MemberStatuses.WaitingForAccept,
+    };
+
+    whereFilter = {
+      ...whereFilter,
+      questionnaireId: {
+        in: input.tests.length > 0 ? input.tests : user_available_questionnairies.map(f => f.questionnaireId),
+      },
+    };
+
+    const items = await this.prisma.members.findMany({
+      select: {
+        id: true,
+        name: true,
+        family: true,
+        fatherName: true,
+        creationTime: true,
+        questionnaireId: true,
+      },
+      where: whereFilter,
+    });
+
 
     return {
       initialize: {

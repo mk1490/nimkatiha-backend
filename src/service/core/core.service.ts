@@ -57,7 +57,7 @@ export class CoreService extends BaseService {
   get schoolGrades() {
     return [
       { title: 'هفتم', value: 1 },
-      { title: 'هشتم', value: 3 },
+      { title: 'هشتم', value: 2 },
       { title: 'نهم', value: 3 },
       { title: 'دهم', value: 4 },
       { title: 'یازدهم', value: 5 },
