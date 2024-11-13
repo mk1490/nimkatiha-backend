@@ -27,6 +27,13 @@ model users {
   accessPermissionGroupId String
 }
 
+model user_available_questionnairies {
+  id              String   @id() @default(uuid())
+  userId          String
+  questionnaireId String
+  createDate      DateTime @default(now())
+}
+
 model access_permission_group {
   id          String   @id() @default(uuid())
   title       String?

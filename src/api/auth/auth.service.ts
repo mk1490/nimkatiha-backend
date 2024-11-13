@@ -30,15 +30,15 @@ export class AuthService extends BaseService {
             }
         })
 
-        const accessPermissionItem = await this.prisma.access_permission_group.findFirst({
-            where:{
-                id: userItem.accessPermissionGroupId
-            }
-        })
+        // const accessPermissionItem = await this.prisma.access_permission_group.findFirst({
+        //     where:{
+        //         id: userItem.accessPermissionGroupId
+        //     }
+        // })
 
-        if (!accessPermissionItem) {
-            this.handleUserInvalid()
-        }
+        // if (!accessPermissionItem) {
+        //     this.handleUserInvalid()
+        // }
 
 
         if (!userItem)

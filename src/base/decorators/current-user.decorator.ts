@@ -28,7 +28,7 @@ export const CurrentUser = createParamDecorator(async (name: string, ctx: Execut
         if (!userItem)
             return null;
         const userType = await usersService.getUserTypeKeyByUserItem(userItem.accessPermissionGroupId);
-        const isAdmin = await accessPermissionService.userIsAdminByUserId(userItem.id);
+        // const isAdmin = await accessPermissionService.userIsAdminByUserId(userItem.id);
         return {
             id: userItem.id,
             name: userItem.name,
@@ -38,7 +38,6 @@ export const CurrentUser = createParamDecorator(async (name: string, ctx: Execut
             username: userItem.username,
             mobileNumber: null,
             nationalCode: null,
-            isAdmin: isAdmin,
         } as CurrentUserModel
     } else {
         return null;

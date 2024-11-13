@@ -37,6 +37,12 @@ export class UserController extends BaseController {
     @Query('userId') userId: string) {
     return {
       accessPermissionRuleItems: await this.accessPermissionService.getListOfPermissions(),
+      availableMembers: await this.prisma.test_templates.findMany({
+        select: {
+          id: true,
+          title: true,
+        },
+      }),
     };
   }
 
@@ -46,16 +52,9 @@ export class UserController extends BaseController {
   // @Roles('users.create', 'users.update', 'users.delete', 'users.change_password')
   @UseGuards(JwtAuthGuard, RolesGuard)
   async getList() {
-    const accessPermissionItem = await this.prisma.access_permission_group.findFirst({
-      where: {
-        name: 'admin',
-      },
-    });
-
     const items = await this.prisma.users.findMany({
       where: {
         isDeleted: false,
-        accessPermissionGroupId: accessPermissionItem.id,
       },
     });
     return items;
@@ -98,24 +97,47 @@ export class UserController extends BaseController {
     @Body() input: CreateUpdateUserDto,
   ) {
     await this.checkUserNameExists(input.username);
-    await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
+    // await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
 
     const password = await this.helper.generateHashPassword(input.password);
 
-    const item = await this.prisma.users.create({
+    const transactions = [];
+
+    const id = this.helper.generateUuid();
+
+    transactions.push(this.prisma.users.create({
       data: {
+        id,
         name: input.name,
         family: input.family,
         fatherName: '',
         username: input.username,
         isDeleted: false,
         password: password,
-        accessPermissionGroupId: input.accessPermissionGroupId,
+        accessPermissionGroupId: '',
+      },
+    }));
+    transactions.push(this.prisma.user_available_questionnairies.createMany({
+      data: input.tests.map(f => {
+        return {
+          questionnaireId: f,
+          userId: id,
+        };
+      }),
+    }));
+
+
+    await this.prisma.$transaction(transactions);
+
+    const userItem = await this.prisma.users.findFirst({
+      where: {
+        id,
       },
     });
-    delete item.password;
+
+    delete userItem.password;
     return {
-      ...item,
+      ...userItem,
       accessPermissionTitle: await this.accessPermissionService.accessPermissionTitleById(input.accessPermissionGroupId),
     };
   }
@@ -155,7 +177,7 @@ export class UserController extends BaseController {
     @Param('id') id,
     @Body() input: CreateUpdateUserDto,
   ) {
-    await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
+    // await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
     const item = await this.prisma.users.findFirst({
       where: {
         id: id,
@@ -171,10 +193,11 @@ export class UserController extends BaseController {
 
     await this.usersService.checkUsernameIfExists(input.username);
 
-    await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
+    // await this.checkAccessPermissionGroupIfExists(input.accessPermissionGroupId);
 
+    const transactions = [];
 
-    const updateItem = await this.prisma.users.update({
+    transactions.push(this.prisma.users.update({
       where: {
         id: item.id,
       },
@@ -183,11 +206,26 @@ export class UserController extends BaseController {
         family: input.family,
         accessPermissionGroupId: input.accessPermissionGroupId,
       },
-    });
-    delete updateItem.password;
+    }));
 
+
+    transactions.push(this.prisma.user_available_questionnairies.createMany({
+      data: input.tests.map(f => {
+        return {
+          questionnaireId: f,
+          userId: id,
+        };
+      }),
+    }));
+    await this.prisma.$transaction(transactions);
+    const userItem = await this.prisma.users.findFirst({
+      where: {
+        id,
+      },
+    });
+    delete userItem.password;
     return {
-      ...updateItem,
+      ...userItem,
       accessPermissionTitle: await this.accessPermissionService.accessPermissionTitleById(input.accessPermissionGroupId),
     };
   }
