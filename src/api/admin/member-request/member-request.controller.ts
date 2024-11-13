@@ -5,6 +5,8 @@ import { CoreService } from '../../../service/core/core.service';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 import { readdirSync } from 'fs';
 import * as test from 'node:test';
+import { CurrentUserModel } from '../../../base/interfaces/current-user.interface';
+import { CurrentUser } from '../../../base/decorators/current-user.decorator';
 
 @Controller('member-request')
 export class MemberRequestController extends BaseController {
@@ -17,7 +19,9 @@ export class MemberRequestController extends BaseController {
 
 
   @Post('/list')
-  async getList(@Body() input) {
+  async getList(
+    @CurrentUser() currentUser: CurrentUserModel,
+    @Body() input) {
     const items = await this.prisma.members.findMany({
       select: {
         id: true,
@@ -35,7 +39,20 @@ export class MemberRequestController extends BaseController {
       },
     });
 
-    const testItems = await this.prisma.test_templates.findMany();
+
+    const user_available_questionnairies = await this.prisma.user_available_questionnairies.findMany({
+      where: {
+        userId: currentUser.id,
+      },
+    });
+
+    const testItems = await this.prisma.test_templates.findMany({
+      where: {
+        id: {
+          in: user_available_questionnairies.map(f => f.questionnaireId),
+        },
+      },
+    });
 
     return {
       initialize: {

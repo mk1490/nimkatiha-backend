@@ -36,13 +36,7 @@ export class UserController extends BaseController {
   async _initialize(
     @Query('userId') userId: string) {
     return {
-      accessPermissionRuleItems: await this.accessPermissionService.getListOfPermissions(),
-      availableMembers: await this.prisma.test_templates.findMany({
-        select: {
-          id: true,
-          title: true,
-        },
-      }),
+      ...await this.initializeItems(),
     };
   }
 
@@ -75,17 +69,18 @@ export class UserController extends BaseController {
     if (!item)
       throw new NotFoundException();
 
+    delete item.password;
+    const user_available_questionnairies = await this.prisma.user_available_questionnairies.findMany({
+      where: {
+        userId: item.id,
+      },
+    });
+
+    item['availableTemplates'] = user_available_questionnairies.map(f => f.questionnaireId);
 
     return {
       result: item,
-      initialize: {
-        permissionGroupItems: await this.prisma.accessPermissionGroup.findMany({
-          select: {
-            id: true,
-            title: true,
-          },
-        }),
-      },
+      initialize: await this.initializeItems(),
     };
   }
 
@@ -209,6 +204,13 @@ export class UserController extends BaseController {
     }));
 
 
+    transactions.push(this.prisma.user_available_questionnairies.deleteMany({
+      where: {
+        userId: item.id,
+      },
+    }))
+
+
     transactions.push(this.prisma.user_available_questionnairies.createMany({
       data: input.tests.map(f => {
         return {
@@ -258,5 +260,17 @@ export class UserController extends BaseController {
     const exists = await this.accessPermissionService.checkAccessPermissionGroupIfExists(id);
     if (!exists)
       throw new NotAcceptableException('شناسه گروه کاربری درخواست شده وجود ندارد!');
+  }
+
+  private async initializeItems() {
+    return {
+      accessPermissionRuleItems: await this.accessPermissionService.getListOfPermissions(),
+      availableTemplates: await this.prisma.test_templates.findMany({
+        select: {
+          id: true,
+          title: true,
+        },
+      }),
+    };
   }
 }
