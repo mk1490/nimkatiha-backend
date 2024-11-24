@@ -37,6 +37,9 @@ export class CoreController extends BaseController {
         message: 'لینک درخواستی معتبر نیست!',
       };
     }
+
+    // await this.pris
+
     return {
       success: true,
       questionnaireId: testTemplateItem.id,

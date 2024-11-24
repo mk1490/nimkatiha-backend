@@ -10,6 +10,6 @@ export class CreateUpdateTestTemplateDto {
 
 
   @ApiProperty()
-  keys: string[];
+  items: any[];
 
 }

@@ -9,6 +9,19 @@ export class TestTemplateController extends BaseController {
     super();
   }
 
+  @Get('/initialize')
+  async initialize() {
+
+
+    const formTemplates = await this.prisma.form_templates.findMany();
+
+    return {
+      formTemplates: formTemplates.map(f => {
+        return this.helper.getKeyValue(f.title, f.id);
+      }),
+    };
+  }
+
   @Get('/list')
   async getList() {
     return await this.prisma.test_templates.findMany();
@@ -54,11 +67,12 @@ export class TestTemplateController extends BaseController {
     }));
 
 
-    transaction.push(this.prisma.test_template_disabled_form.createMany({
-      data: input.keys.map(f => {
+    transaction.push(this.prisma.test_template_levels.createMany({
+      data: input.items.map(f => {
         return {
           parentId: id,
-          key: f,
+          levelTitle: f.title,
+          formId: f.formId,
         };
       }),
     }));
@@ -86,36 +100,6 @@ export class TestTemplateController extends BaseController {
         id,
       },
     });
-
-
-    if (input.keys.length > 0) {
-
-      transaction.push(this.prisma.test_template_disabled_form.deleteMany({
-        where: {
-          parentId: item.id,
-        },
-      }));
-
-      transaction.push(this.prisma.test_template_disabled_form.createMany({
-        data: input.keys.map(f => {
-          return {
-            parentId: id,
-            key: f,
-          };
-        }),
-      }));
-    }
-
-
-    transaction.push(this.prisma.test_templates.update({
-      data: {
-        title: input.title,
-        slug: input.slug,
-      },
-      where: {
-        id: item.id,
-      },
-    }));
 
 
     await this.prisma.$transaction(transaction);

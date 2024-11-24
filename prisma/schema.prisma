@@ -209,10 +209,11 @@ model test_templates {
   slug  String
 }
 
-model test_template_disabled_form {
-  id       String @id() @default(uuid())
-  parentId String
-  key      String
+model test_template_levels {
+  id         String @id() @default(uuid())
+  parentId   String
+  levelTitle String
+  formId     String
 }
 
 model form_templates {
