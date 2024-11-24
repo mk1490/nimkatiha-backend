@@ -9,7 +9,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  // url      = env("DATABASE_URL")
   url      = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
 }
 
@@ -214,4 +213,35 @@ model test_template_disabled_form {
   id       String @id() @default(uuid())
   parentId String
   key      String
+}
+
+model form_templates {
+  id        String  @id() @default(uuid())
+  title     String
+  creatorId String?
+}
+
+model form_template_items {
+  id         String  @id() @default(uuid())
+  label      String
+  type       Int
+  size       Int
+  isRequired Boolean
+  parentId   String
+  metaData   String?
+  creatorId  String?
+}
+
+model form_template_selection_patterns {
+  id        String  @id() @default(uuid())
+  title     String
+  creatorId String?
+}
+
+model form_template_selection_pattern_items {
+  id        String  @id() @default(uuid())
+  text      String
+  value     String
+  parentId  String
+  creatorId String?
 }

@@ -14,11 +14,9 @@ import { SmsService } from '../../service/sms/sms.service';
 import { ProfileImageSliderController } from './profile-image-slider/profile-image-slider.controller';
 import { WorkflowService } from '../../service/workflow/workflow.service';
 import { NotificationService } from '../../service/notification/notification.service';
-import { MarketController } from './market/market.controller';
-import { MarketDeskController } from './market-desk/market-desk.controller';
-import { MemberRequestController } from './member-request/member-request.controller';
-import { CoreService } from '../../service/core/core.service';
 import { TestTemplateController } from './test-template/test-template.controller';
+import { FormTemplateController } from './form-template/form-template.controller';
+import { FormTemplateItemsController } from './form-template-items/form-template-items.controller';
 
 @Module({
   controllers: [
@@ -31,10 +29,9 @@ import { TestTemplateController } from './test-template/test-template.controller
     SettingIpgController,
     CoreController,
     ProfileImageSliderController,
-    MarketController,
-    MarketDeskController,
-    MemberRequestController,
     TestTemplateController,
+    FormTemplateController,
+    FormTemplateItemsController,
   ],
   providers: [
     AccessPermissionService,
@@ -43,7 +40,6 @@ import { TestTemplateController } from './test-template/test-template.controller
     SmsService,
     WorkflowService,
     NotificationService,
-    CoreService,
   ],
 })
 export class AdminModule {
