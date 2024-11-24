@@ -38,11 +38,21 @@ export class CoreController extends BaseController {
       };
     }
 
-    // await this.pris
+    const levels = await this.prisma.test_template_levels.findMany({
+      where: {
+        parentId: testTemplateItem.id,
+      },
+    });
 
     return {
       success: true,
       questionnaireId: testTemplateItem.id,
+      levels: levels.map(f => {
+        return {
+          title: f.levelTitle,
+          id: f.id,
+        };
+      }),
     };
   }
 
