@@ -9,7 +9,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
+  url      = env("DATABASE_URL")
 }
 
 model users {

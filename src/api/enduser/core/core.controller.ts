@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotAcceptableException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, NotAcceptableException, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import * as fs from 'fs';
 import { homedir } from 'os';
@@ -12,6 +12,8 @@ import { JwtAuthGuard } from '../../auth/jwt-auth-guard';
 import { IncreaseDepositDto } from './dto/increase-deposit-dto';
 import { CalculateRateDto } from './dto/calculate-rate-dto';
 import * as test from 'node:test';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from '../../auth/constants';
 
 @Controller('core')
 export class CoreController extends BaseController {
@@ -25,7 +27,9 @@ export class CoreController extends BaseController {
 
 
   @Get('/initialize')
-  async initialize(@Query('slug') slug) {
+  async initialize(
+    @Headers('authorization') authorization,
+    @Query('slug') slug) {
     const testTemplateItem = await this.prisma.test_templates.findFirst({
       where: {
         slug: slug,
@@ -36,6 +40,22 @@ export class CoreController extends BaseController {
         success: false,
         message: 'لینک درخواستی معتبر نیست!',
       };
+    }
+
+    let memberItem;
+    try {
+      const jwtPayload = await this.jwtService.verifyAsync(authorization.replace('Bearer ', ''), {
+        secret: jwtConstants.privateKey,
+      });
+
+      memberItem = await this.prisma.members.findFirst({
+        where: {
+          id: jwtPayload.sub,
+        },
+      });
+
+    } catch (e) {
+
     }
 
     const levels = await this.prisma.test_template_levels.findMany({
@@ -53,6 +73,8 @@ export class CoreController extends BaseController {
     return {
       success: true,
       questionnaireId: testTemplateItem.id,
+      questionnaireTitle: testTemplateItem.title,
+      mobileNumber: memberItem ? memberItem.mobileNumber : '',
       levels: levels.map(f => {
         return {
           title: f.levelTitle,

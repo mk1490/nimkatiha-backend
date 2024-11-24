@@ -22,4 +22,7 @@ export class CreateUpdateUserDto {
     @ApiProperty()
     accessPermissionGroupId: string;
 
+
+    tests: string[];
+
 }

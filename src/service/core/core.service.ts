@@ -45,6 +45,25 @@ export class CoreService extends BaseService {
   }
 
 
+  get educationGrades() {
+    return [
+      { title: 'متوسطه اوّل', value: 1 },
+      { title: 'متوسطه دوّم', value: 2 },
+    ];
+  }
+
+
+
+  get schoolGrades() {
+    return [
+      { title: 'هفتم', value: 1 },
+      { title: 'هشتم', value: 2 },
+      { title: 'نهم', value: 3 },
+      { title: 'دهم', value: 4 },
+      { title: 'یازدهم', value: 5 },
+    ];
+  }
+
 
   get maritalStatus() {
     return [
@@ -87,26 +106,27 @@ export class CoreService extends BaseService {
   }
 
 
-  get tarheVelayatItems(){
+  get tarheVelayatItems() {
     return [
-      {title: 'استانی', value: 1},
-      {title: 'حوزه‌ای', value: 2},
-    ]
+      { title: 'استانی', value: 1 },
+      { title: 'حوزه‌ای', value: 2 },
+    ];
   }
 
 
-  get astaneQodsItems(){
+  get astaneQodsItems() {
     return [
-      {title: 'بی‌نهایت شو', value: 1},
-      {title: 'برهان', value: 2},
-    ]
+      { title: 'بی‌نهایت شو', value: 1 },
+      { title: 'برهان', value: 2 },
+    ];
   }
-  get oqafItems(){
+
+  get oqafItems() {
     return [
-      {title: 'ترتیل', value: 1},
-      {title: 'قرائت', value: 2},
-      {title: 'حفظ', value: 3}
-    ]
+      { title: 'ترتیل', value: 1 },
+      { title: 'قرائت', value: 2 },
+      { title: 'حفظ', value: 3 },
+    ];
   }
 
 
@@ -126,6 +146,10 @@ export class CoreService extends BaseService {
       disabilityStatus: this.disabilityStatus,
       maritalStatus: this.maritalStatus,
       educationLevels: this.educationLevels,
+      diseaseBackgroundItems: this.diseaseBackgroundItems,
+      lifeSituationItems: this.lifeSituationItems,
+      educationGrades: this.educationGrades,
+      schoolGrades: this.schoolGrades,
     };
   }
 
