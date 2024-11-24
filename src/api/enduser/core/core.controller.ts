@@ -44,6 +44,12 @@ export class CoreController extends BaseController {
       },
     });
 
+
+    const formTemplates = await this.prisma.form_templates.findMany();
+
+
+    const formTemplateItem = await this.prisma.form_template_items.findMany();
+
     return {
       success: true,
       questionnaireId: testTemplateItem.id,
@@ -51,6 +57,15 @@ export class CoreController extends BaseController {
         return {
           title: f.levelTitle,
           id: f.id,
+          formItems: formTemplateItem.filter(x => x.parentId == f.formId).map(formItem => {
+            return {
+              size: `v-col-${formItem.size}`,
+              label: formItem.label,
+              type: formItem.type,
+              key: formItem.key,
+              isRequired: formItem.isRequired,
+            };
+          }),
         };
       }),
     };

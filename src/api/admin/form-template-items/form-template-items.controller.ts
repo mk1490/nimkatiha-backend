@@ -44,12 +44,14 @@ export class FormTemplateItemsController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdateFormTemplateItemDto) {
+    const randomNumber = Math.random().toString().substr(2, 6);
     return await this.prisma.form_template_items.create({
       data: {
         parentId: input.parentId,
         label: input.label,
         type: input.type,
         size: input.size,
+        key: `field_${randomNumber}_${input.type}`,
         isRequired: input.isRequired,
       },
     });

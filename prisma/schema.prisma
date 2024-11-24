@@ -228,6 +228,7 @@ model form_template_items {
   type       Int
   size       Int
   isRequired Boolean
+  key       String
   parentId   String
   metaData   String?
   creatorId  String?
