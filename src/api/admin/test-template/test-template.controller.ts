@@ -103,6 +103,33 @@ export class TestTemplateController extends BaseController {
     });
 
 
+    transaction.push(this.prisma.test_templates.update({
+      where: {
+        id,
+      },
+      data: {
+        title: input.title,
+        slug: input.slug,
+      },
+    }));
+
+
+    transaction.push(this.prisma.test_template_levels.deleteMany({
+      where: {
+        parentId: id,
+      },
+    }));
+
+    transaction.push(this.prisma.test_template_levels.createMany({
+      data: input.items.map(f => {
+        return {
+          parentId: id,
+          levelTitle: f.levelTitle,
+          formId: f.formId,
+        };
+      }),
+    }));
+
     await this.prisma.$transaction(transaction);
 
 
