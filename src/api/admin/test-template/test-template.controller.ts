@@ -36,17 +36,18 @@ export class TestTemplateController extends BaseController {
     });
 
 
-    const disabledForm = await this.prisma.test_template_disabled_form.findMany({
+    const testTemplateLevels = await this.prisma.test_template_levels.findMany({
       where: {
         parentId: item.id,
       },
     });
 
     return {
-      ...item,
-      disabledForm: disabledForm.map(f => {
-        return f.key;
-      }),
+      data: {
+        ...item,
+        items: testTemplateLevels,
+      },
+      initialize: await this.initialize(),
     };
   }
 
