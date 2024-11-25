@@ -71,6 +71,8 @@ export class CoreController extends BaseController {
 
     const formTemplateItem = await this.prisma.form_template_items.findMany();
 
+    const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany();
+
     return {
       success: true,
       questionnaireId: testTemplateItem.id,
@@ -87,6 +89,7 @@ export class CoreController extends BaseController {
               type: formItem.type,
               key: formItem.key,
               isRequired: formItem.isRequired,
+              children: selectionPatternItems.filter(x => x.parentId == formItem.id),
             };
           }),
         };

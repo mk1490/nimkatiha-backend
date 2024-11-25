@@ -44,12 +44,38 @@ export class FormTemplateItemsController extends BaseController {
   @Get('/:id')
   async getDetails(@Param('id') id) {
 
-    return await this.prisma.form_template_items.findMany({
+    let payload: any = {};
+
+
+    const item = await this.prisma.form_template_items.findFirst({
       where: {
-        parentId: id,
+        id,
       },
     });
+
+    if ([
+      FormInputTypes.RadioButton,
+      FormInputTypes.SingleSelectionBox,
+      FormInputTypes.MultipleSelectionBox,
+      FormInputTypes.Checkbox,
+    ].includes(item.type)) {
+      payload.items = await this.prisma.form_template_selection_pattern_items.findMany({
+        where: {
+          parentId: id,
+        },
+      });
+    }
+    payload = {
+      ...payload,
+      ...item,
+    };
+    return {
+      data: payload,
+      initialize: await this.initialize(),
+    };
+
   }
+
 
   @Post()
   async create(@Body() input: CreateUpdateFormTemplateItemDto) {
@@ -98,13 +124,15 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
-  @Put()
+  @Put('/:id')
   async update(
     @Param('id') id,
     @Body() input: CreateUpdateFormTemplateItemDto) {
-    return await this.prisma.form_template_items.findMany({
+    return await this.prisma.form_template_items.updateMany({
       where: {
-        parentId: input.parentId,
+        id,
+      },
+      data: {
         label: input.label,
         type: input.type,
         size: input.size,

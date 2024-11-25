@@ -228,7 +228,7 @@ model form_template_items {
   type       Int
   size       Int
   isRequired Boolean
-  key       String
+  key        String
   parentId   String
   metaData   String?
   creatorId  String?
@@ -246,4 +246,21 @@ model form_template_selection_pattern_items {
   value     String
   parentId  String
   creatorId String?
+}
+
+model answer_sheets {
+  id                  String   @id() @default(uuid())
+  memberId            String
+  testTemplateLevelId String
+  testTemplateId      String
+  metaData            String   @db.LongText
+  creationTime        DateTime @default(now())
+}
+
+model answer_sheet_items {
+  id                  String   @id() @default(uuid())
+  fieldKey            String
+  fieldValue          String?
+  parentAnswerSheetId String
+  creationTime        DateTime @default(now())
 }

@@ -72,7 +72,7 @@ export class TestTemplateController extends BaseController {
       data: input.items.map(f => {
         return {
           parentId: id,
-          levelTitle: f.title,
+          levelTitle: f.levelTitle,
           formId: f.formId,
         };
       }),

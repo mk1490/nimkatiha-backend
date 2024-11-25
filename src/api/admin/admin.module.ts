@@ -17,6 +17,7 @@ import { NotificationService } from '../../service/notification/notification.ser
 import { TestTemplateController } from './test-template/test-template.controller';
 import { FormTemplateController } from './form-template/form-template.controller';
 import { FormTemplateItemsController } from './form-template-items/form-template-items.controller';
+import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
 
 @Module({
   controllers: [
@@ -32,6 +33,7 @@ import { FormTemplateItemsController } from './form-template-items/form-template
     TestTemplateController,
     FormTemplateController,
     FormTemplateItemsController,
+    AnswerSheetController,
   ],
   providers: [
     AccessPermissionService,
