@@ -14,6 +14,8 @@ import { CalculateRateDto } from './dto/calculate-rate-dto';
 import * as test from 'node:test';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constants';
+import { FormInputTypes } from '../../../base/enums/formInputTypes';
+import { CoreService } from '../../../service/core/core.service';
 
 @Controller('core')
 export class CoreController extends BaseController {
@@ -22,6 +24,7 @@ export class CoreController extends BaseController {
   constructor(
     private readonly settingsService: SettingsService,
     private readonly jwtService: JwtService,
+    private readonly coreService: CoreService,
   ) {
     super();
   }
@@ -73,23 +76,37 @@ export class CoreController extends BaseController {
 
     const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany();
 
+
+    const cityItems = await this.coreService.cityItems();
+
     return {
       success: true,
       questionnaireId: testTemplateItem.id,
       questionnaireTitle: testTemplateItem.title,
       mobileNumber: memberItem ? memberItem.mobileNumber : '',
+
       levels: levels.map(f => {
         return {
           title: f.levelTitle,
           id: f.id,
           formItems: formTemplateItem.filter(x => x.parentId == f.formId).map(formItem => {
+            let children = [];
+
+            if (formItem.type == FormInputTypes.City) {
+              children = cityItems.map(f => {
+                return this.helper.getKeyValue(f.title, f.id);
+              });
+            } else {
+              children = selectionPatternItems.filter(x => x.parentId == formItem.id);
+            }
+
             return {
               size: `v-col-${formItem.size}`,
               label: formItem.label,
               type: formItem.type,
               key: formItem.key,
               isRequired: formItem.isRequired,
-              children: selectionPatternItems.filter(x => x.parentId == formItem.id),
+              children: children,
             };
           }),
         };
