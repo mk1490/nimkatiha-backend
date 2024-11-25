@@ -22,9 +22,9 @@ export class FormTemplateItemsController extends BaseController {
       this.helper.getKeyValue('تک انتخابی (رادیو باتن)', FormInputTypes.RadioButton),
       this.helper.getKeyValue('تک انتخابی (Selection Box)', FormInputTypes.SingleSelectionBox),
       this.helper.getKeyValue('چند انتخابی (Selection Box)', FormInputTypes.MultipleSelectionBox),
-      this.helper.getKeyValue('چک باکس', FormInputTypes.SingleTextInput),
+      this.helper.getKeyValue('چک باکس', FormInputTypes.Checkbox),
       this.helper.getKeyValue('تاریخ', FormInputTypes.DatePicker),
-      this.helper.getKeyValue('ساعت', FormInputTypes.TimePicker),
+      // this.helper.getKeyValue('ساعت', FormInputTypes.TimePicker),
     ];
     return {
       formTypes,
@@ -135,7 +135,19 @@ export class FormTemplateItemsController extends BaseController {
   async update(
     @Param('id') id,
     @Body() input: CreateUpdateFormTemplateItemDto) {
-    return await this.prisma.form_template_items.updateMany({
+
+
+    const transaction = [];
+    transaction.push(this.prisma.form_template_selection_pattern_items.createMany({
+      data: input.items.map((f, i) => {
+        return {
+          text: f,
+          value: i.toString(),
+          parentId: id,
+        };
+      }),
+    }));
+    transaction.push(this.prisma.form_template_items.updateMany({
       where: {
         id,
       },
@@ -144,6 +156,13 @@ export class FormTemplateItemsController extends BaseController {
         type: input.type,
         size: input.size,
         isRequired: input.isRequired,
+      },
+    }));
+    await this.prisma.$transaction(transaction);
+
+    return await this.prisma.form_template_items.findFirst({
+      where: {
+        id,
       },
     });
   }
