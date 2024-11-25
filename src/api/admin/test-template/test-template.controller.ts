@@ -166,6 +166,35 @@ export class TestTemplateController extends BaseController {
     };
   }
 
+
+  @Delete('/test-template/:id')
+  async deleteTestTemplate(@Param('id') id) {
+
+    const transactions = [];
+
+
+    transactions.push(this.prisma.form_template_items.delete({
+      where: {
+        id,
+      },
+    }));
+
+
+    transactions.push(this.prisma.test_template_levels.deleteMany({
+      where: {
+        formId: id,
+      },
+    }));
+
+    transactions.push(this.prisma.form_template_items.deleteMany({
+      where: {
+        parentId: id,
+      },
+    }));
+
+    await this.prisma.$transaction(transactions);
+  }
+
   @Delete('/delete-level-item/:id')
   async deleteLevelItem(@Param('id') id) {
     await this.prisma.test_template_levels.deleteMany({
