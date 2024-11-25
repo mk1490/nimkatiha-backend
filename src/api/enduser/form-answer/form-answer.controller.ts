@@ -83,7 +83,7 @@ export class FormAnswerController extends BaseController {
               let finalValue = '';
               value = value.map((f, i) => {
                 finalValue += form_template_selection_pattern_items.find(x => x.value === f && x.parentId == field.id).text;
-                if (i != value.length) {
+                if (i != (value.length - 1)) {
                   finalValue += ', ';
                 }
                 return f;
