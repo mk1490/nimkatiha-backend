@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateFormTemplateItemDto } from './dto/create-update-form-template-item-dto';
 import { FormInputTypes } from '../../../base/enums/formInputTypes';
@@ -168,4 +168,22 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
+
+  @Delete('/:id')
+  async delete(@Param('id') id) {
+    const transactions = [];
+    transactions.push(this.prisma.form_templates.deleteMany({
+      where: {
+        id: id,
+      },
+    }));
+
+    transactions.push(this.prisma.form_template_items.deleteMany({
+      where: {
+        parentId: id,
+      },
+    }));
+
+    await this.prisma.$transaction(transactions);
+  }
 }
