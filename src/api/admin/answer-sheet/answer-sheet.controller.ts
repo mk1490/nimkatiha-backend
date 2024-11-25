@@ -44,11 +44,6 @@ export class AnswerSheetController extends BaseController {
     });
 
 
-    const levelItems = await this.prisma.test_template_levels.findMany({
-      where: {
-        parentId: questionnaireId,
-      },
-    });
 
     const answer_sheet_items = await this.prisma.answer_sheet_items.findMany({
       where: {},
@@ -57,21 +52,16 @@ export class AnswerSheetController extends BaseController {
     const formTemplateItems = await this.prisma.form_template_items.findMany();
 
     return {
-      tabs: levelItems.map(f => {
+      tabs: answerSheets.map(f => {
+        const formResponseItems = answer_sheet_items.filter(x => x.parentAnswerSheetId == f.id);
         return {
           title: f.levelTitle,
-          answers: answerSheets.map(answerItem => {
-            const formResponseItems = answer_sheet_items.filter(x => x.parentAnswerSheetId == answerItem.id);
-            return formResponseItems.map(formResponseItem => {
-              return {
-                label: formTemplateItems.find(x => x.key == formResponseItem.fieldKey).label,
-                value: formResponseItem.fieldValue,
-              };
-            });
+          answers: formResponseItems.map(formResponseItem => {
+            return {
+              label: formTemplateItems.find(x => x.key == formResponseItem.fieldKey).label,
+              value: formResponseItem.fieldValue,
+            };
           }),
-          // answers: answerLevels.map(answerLevelItem => {
-          //   return { levelTitle: answerLevelItem.levelTitle };
-          // }),
         };
       }),
     };

@@ -252,6 +252,7 @@ model answer_sheets {
   id                  String   @id() @default(uuid())
   memberId            String
   testTemplateLevelId String
+  levelTitle          String
   testTemplateId      String
   metaData            String   @db.LongText
   creationTime        DateTime @default(now())
@@ -260,7 +261,9 @@ model answer_sheets {
 model answer_sheet_items {
   id                  String   @id() @default(uuid())
   fieldKey            String
-  fieldValue          String?
+  fieldLabel          String
+  fieldValue          String?  @db.LongText
+  fieldType           Int
   parentAnswerSheetId String
   creationTime        DateTime @default(now())
 }

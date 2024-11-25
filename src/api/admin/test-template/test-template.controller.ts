@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateTestTemplateDto } from './dto/create-update-test-template-dto';
 
@@ -89,6 +89,26 @@ export class TestTemplateController extends BaseController {
   }
 
 
+  @Put('/update-level-item-form/:id')
+  async updateLevelItem(
+    @Param('id') id,
+    @Body('newId') newId,
+  ) {
+    const item = await this.prisma.test_template_levels.update({
+      data: {
+        formId: newId,
+      },
+      where: {
+        id,
+      },
+    });
+    return {
+      id: item.id,
+      levelTitle: item.levelTitle,
+    };
+  }
+
+
   @Put('/:id')
   async update(
     @Param('id') id,
@@ -113,23 +133,6 @@ export class TestTemplateController extends BaseController {
       },
     }));
 
-
-    transaction.push(this.prisma.test_template_levels.deleteMany({
-      where: {
-        parentId: id,
-      },
-    }));
-
-    transaction.push(this.prisma.test_template_levels.createMany({
-      data: input.items.map(f => {
-        return {
-          parentId: id,
-          levelTitle: f.levelTitle,
-          formId: f.formId,
-        };
-      }),
-    }));
-
     await this.prisma.$transaction(transaction);
 
 
@@ -138,7 +141,39 @@ export class TestTemplateController extends BaseController {
         id: item.id,
       },
     });
-
   }
+
+
+  @Post('/add-level-item/:parentId')
+  async addLevelItem(@Param('parentId') parentId) {
+    const items = await this.prisma.test_template_levels.findMany({
+      where: {
+        parentId: parentId,
+      },
+    });
+
+
+    const item = await this.prisma.test_template_levels.create({
+      data: {
+        parentId: parentId,
+        levelTitle: 'مرحله ' + (items.length + 1),
+        formId: '',
+      },
+    });
+    return {
+      id: item.id,
+      levelTitle: item.levelTitle,
+    };
+  }
+
+  @Delete('/delete-level-item/:id')
+  async deleteLevelItem(@Param('id') id) {
+    await this.prisma.test_template_levels.deleteMany({
+      where: {
+        id,
+      },
+    });
+  }
+
 
 }
