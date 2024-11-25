@@ -191,14 +191,6 @@ export class MemberRequestController extends BaseController {
     if (!testTemplateItem)
       throw new NotAcceptableException();
 
-
-    const testTemplateDisabledForm = await this.prisma.test_template_disabled_form.findMany({
-      where: {
-        parentId: testTemplateItem.id,
-      },
-    });
-
-
     switch (currentStep) {
 
       case 'verifyPhoneNumber': {
@@ -236,10 +228,6 @@ export class MemberRequestController extends BaseController {
             diseaseBackgroundItems: this.coreService.diseaseBackgroundItems,
             cityItems: await this.coreService.cityItems(),
           },
-          disabledForms: testTemplateDisabledForm.map(f => {
-            return f.key;
-          }),
-
         };
       }
 

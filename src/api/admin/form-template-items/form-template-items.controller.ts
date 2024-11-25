@@ -41,18 +41,58 @@ export class FormTemplateItemsController extends BaseController {
     });
   }
 
+  @Get('/:id')
+  async getDetails(@Param('id') id) {
+
+    return await this.prisma.form_template_items.findMany({
+      where: {
+        parentId: id,
+      },
+    });
+  }
 
   @Post()
   async create(@Body() input: CreateUpdateFormTemplateItemDto) {
     const randomNumber = Math.random().toString().substr(2, 6);
-    return await this.prisma.form_template_items.create({
+    const transactions = [];
+
+
+    const id = this.helper.generateUuid();
+    transactions.push(this.prisma.form_template_items.create({
       data: {
+        id,
         parentId: input.parentId,
         label: input.label,
         type: input.type,
         size: input.size,
         key: `field_${randomNumber}_${input.type}`,
         isRequired: input.isRequired,
+      },
+    }));
+
+
+    if ([
+      FormInputTypes.RadioButton,
+      FormInputTypes.SingleSelectionBox,
+      FormInputTypes.MultipleSelectionBox,
+      FormInputTypes.Checkbox,
+    ]) {
+      transactions.push(this.prisma.form_template_selection_pattern_items.createMany({
+        data: input.items.map((f, i) => {
+          return {
+            text: f,
+            value: i.toString(),
+            parentId: id,
+          };
+        }),
+      }));
+    }
+
+    await this.prisma.$transaction(transactions);
+
+    return await this.prisma.form_template_items.findFirst({
+      where: {
+        id,
       },
     });
   }

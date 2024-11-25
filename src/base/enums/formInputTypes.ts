@@ -8,4 +8,5 @@ export enum FormInputTypes {
   MultipleSelectionBox = 7,
   DatePicker = 8,
   TimePicker = 9,
+  Checkbox = 10,
 }

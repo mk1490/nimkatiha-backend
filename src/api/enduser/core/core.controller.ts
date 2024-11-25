@@ -21,6 +21,7 @@ export class CoreController extends BaseController {
 
   constructor(
     private readonly settingsService: SettingsService,
+    private readonly jwtService: JwtService,
   ) {
     super();
   }

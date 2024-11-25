@@ -8,6 +8,9 @@ export class CreateUpdateFormTemplateItemDto {
   @ApiProperty()
   parentId: string;
 
+  @ApiProperty()
+  items: [];
+
 
   @ApiProperty()
   type: FormInputTypes;
