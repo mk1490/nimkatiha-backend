@@ -17,6 +17,14 @@ export class CreateUpdateFormTemplateItemDto {
 
 
   @ApiProperty()
+  minLength: number;
+
+
+  @ApiProperty()
+  maxLength: number;
+
+
+  @ApiProperty()
   size: number;
 
   @ApiProperty()

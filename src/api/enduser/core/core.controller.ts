@@ -109,6 +109,8 @@ export class CoreController extends BaseController {
               label: formItem.label,
               type: formItem.type,
               key: formItem.key,
+              minimum: formItem.minimum,
+              maximum: formItem.maximum,
               isRequired: formItem.isRequired,
               children: children,
             };

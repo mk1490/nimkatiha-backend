@@ -107,6 +107,8 @@ export class FormTemplateItemsController extends BaseController {
         label: input.label,
         type: input.type,
         size: input.size,
+        minimum: Number(input.minLength),
+        maximum: Number(input.maxLength),
         key: this.getKey(input.type),
         isRequired: input.isRequired,
         order: lastOrderItem ? lastOrderItem.order + 1 : 0,
@@ -249,6 +251,8 @@ export class FormTemplateItemsController extends BaseController {
         label: input.label,
         type: input.type,
         size: input.size,
+        minimum: Number(input.minLength),
+        maximum: Number(input.maxLength),
         isRequired: input.isRequired,
       },
     }));

@@ -229,6 +229,8 @@ model form_template_items {
   type       Int
   size       Int
   isRequired Boolean
+  minimum    Int?
+  maximum    Int?
   key        String
   parentId   String
   order      Int     @default(-1)
