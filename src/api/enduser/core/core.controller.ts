@@ -72,7 +72,11 @@ export class CoreController extends BaseController {
     const formTemplates = await this.prisma.form_templates.findMany();
 
 
-    const formTemplateItem = await this.prisma.form_template_items.findMany();
+    const formTemplateItem = await this.prisma.form_template_items.findMany({
+      orderBy: {
+        order: 'asc',
+      },
+    });
 
     const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany();
 

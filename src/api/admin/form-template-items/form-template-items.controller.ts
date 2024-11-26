@@ -38,6 +38,9 @@ export class FormTemplateItemsController extends BaseController {
       where: {
         parentId: parentId,
       },
+      orderBy: {
+        order: 'asc',
+      },
     });
 
 
@@ -91,6 +94,13 @@ export class FormTemplateItemsController extends BaseController {
 
 
     const id = this.helper.generateUuid();
+
+
+    const lastOrderItem = await this.prisma.form_template_items.findFirst({
+      orderBy: {
+        order: 'desc',
+      },
+    });
     transactions.push(this.prisma.form_template_items.create({
       data: {
         id,
@@ -100,6 +110,7 @@ export class FormTemplateItemsController extends BaseController {
         size: input.size,
         key: `field_${randomNumber}_${input.type}`,
         isRequired: input.isRequired,
+        order: lastOrderItem ? lastOrderItem.order + 1 : 0,
       },
     }));
 
@@ -131,13 +142,64 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
+  @Put('/move/:id/:isUp')
+  async moveItem(
+    @Param('id') id,
+    @Param('isUp') isUp) {
+
+    const items = await this.prisma.form_template_items.findMany({
+      orderBy: {
+        order: 'asc',
+      },
+    });
+
+    const transaction = [];
+    if (isUp == '1') {
+      transaction.push(this.prisma.form_template_items.update({
+        where: { id },
+        data: {
+          order: items[items.findIndex(x => x.id == id)].order - 1,
+        },
+      }));
+      transaction.push(this.prisma.form_template_items.updateMany({
+        where: {
+          id: items[items.findIndex(x => x.id == id) - 1].id,
+        },
+        data: {
+          order: items[items.findIndex(x => x.id == id)].order,
+        },
+      }));
+    }else {
+      transaction.push(this.prisma.form_template_items.update({
+        where: { id },
+        data: {
+          order: items[items.findIndex(x => x.id == id)].order + 1,
+        },
+      }));
+      transaction.push(this.prisma.form_template_items.updateMany({
+        where: {
+          id: items[items.findIndex(x => x.id == id) + 1].id,
+        },
+        data: {
+          order: items[items.findIndex(x => x.id == id)].order,
+        },
+      }));
+    }
+    await this.prisma.$transaction(transaction);
+
+  }
+
+
   @Put('/:id')
   async update(
     @Param('id') id,
     @Body() input: CreateUpdateFormTemplateItemDto) {
 
-
     const transaction = [];
+
+    input.items.map(f => {
+      console.log(f.id);
+    });
     transaction.push(this.prisma.form_template_selection_pattern_items.createMany({
       data: input.items.map((f, i) => {
         return {
@@ -168,7 +230,6 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
-
   @Delete('/:id')
   async delete(@Param('id') id) {
     const transactions = [];
@@ -186,4 +247,6 @@ export class FormTemplateItemsController extends BaseController {
 
     await this.prisma.$transaction(transactions);
   }
+
+
 }

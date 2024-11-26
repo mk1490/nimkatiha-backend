@@ -10,7 +10,7 @@ generator client {
 datasource db {
   provider = "mysql"
   // url      = env("DATABASE_URL")
-  url = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
+  url      = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
 }
 
 model users {
@@ -231,6 +231,7 @@ model form_template_items {
   isRequired Boolean
   key        String
   parentId   String
+  order      Int     @default(-1)
   metaData   String?
   creatorId  String?
 }

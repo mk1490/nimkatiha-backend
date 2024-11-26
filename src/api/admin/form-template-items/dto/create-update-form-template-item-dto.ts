@@ -9,7 +9,7 @@ export class CreateUpdateFormTemplateItemDto {
   parentId: string;
 
   @ApiProperty()
-  items: [];
+  items: any[];
 
 
   @ApiProperty()
