@@ -89,7 +89,6 @@ export class FormTemplateItemsController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdateFormTemplateItemDto) {
-    const randomNumber = Math.random().toString().substr(2, 6);
     const transactions = [];
 
 
@@ -108,7 +107,7 @@ export class FormTemplateItemsController extends BaseController {
         label: input.label,
         type: input.type,
         size: input.size,
-        key: `field_${randomNumber}_${input.type}`,
+        key: this.getKey(input.type),
         isRequired: input.isRequired,
         order: lastOrderItem ? lastOrderItem.order + 1 : 0,
       },
@@ -142,6 +141,53 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
+  @Post('/add-item/:parentId')
+  async addItem(
+    @Param('parentId') parentId,
+  ) {
+    const item = await this.prisma.form_template_selection_pattern_items.create({
+      data: {
+        text: '',
+        value: this.helper.generateRandomNumber(6),
+        parentId,
+      },
+    });
+    return {
+      id: item.id,
+    };
+  }
+
+  @Put('/update-item-text/:id')
+  async updateItemTitle(
+    @Param('id') parentId,
+    @Body('text') text,
+  ) {
+    const item = await this.prisma.form_template_selection_pattern_items.update({
+      where: {
+        id: parentId,
+      },
+      data: {
+        text: text,
+      },
+    });
+    return {
+      id: item.id,
+    };
+  }
+
+
+  @Delete('/delete-item/:id')
+  async deleteItem(
+    @Param('id') itemId,
+  ) {
+    await this.prisma.form_template_selection_pattern_items.delete({
+      where: {
+        id: itemId,
+      },
+    });
+  }
+
+
   @Put('/move/:id/:isUp')
   async moveItem(
     @Param('id') id,
@@ -169,7 +215,7 @@ export class FormTemplateItemsController extends BaseController {
           order: items[items.findIndex(x => x.id == id)].order,
         },
       }));
-    }else {
+    } else {
       transaction.push(this.prisma.form_template_items.update({
         where: { id },
         data: {
@@ -194,21 +240,7 @@ export class FormTemplateItemsController extends BaseController {
   async update(
     @Param('id') id,
     @Body() input: CreateUpdateFormTemplateItemDto) {
-
     const transaction = [];
-
-    input.items.map(f => {
-      console.log(f.id);
-    });
-    transaction.push(this.prisma.form_template_selection_pattern_items.createMany({
-      data: input.items.map((f, i) => {
-        return {
-          text: f,
-          value: i.toString(),
-          parentId: id,
-        };
-      }),
-    }));
     transaction.push(this.prisma.form_template_items.updateMany({
       where: {
         id,
@@ -248,5 +280,9 @@ export class FormTemplateItemsController extends BaseController {
     await this.prisma.$transaction(transactions);
   }
 
+  getKey(type) {
+    const randomNumber = Math.random().toString().substr(2, 6);
+    return `field_${randomNumber}_${type}`;
+  }
 
 }
