@@ -96,6 +96,9 @@ export class FormTemplateItemsController extends BaseController {
 
 
     const lastOrderItem = await this.prisma.form_template_items.findFirst({
+      where: {
+        parentId: input.parentId,
+      },
       orderBy: {
         order: 'desc',
       },
@@ -190,12 +193,16 @@ export class FormTemplateItemsController extends BaseController {
   }
 
 
-  @Put('/move/:id/:isUp')
+  @Put('/move/:parentId/:id/:isUp')
   async moveItem(
+    @Param('parentId') parentId,
     @Param('id') id,
     @Param('isUp') isUp) {
 
     const items = await this.prisma.form_template_items.findMany({
+      where: {
+        parentId: parentId,
+      },
       orderBy: {
         order: 'asc',
       },

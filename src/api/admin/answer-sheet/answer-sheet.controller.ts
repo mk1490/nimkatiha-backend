@@ -14,7 +14,6 @@ export class AnswerSheetController extends BaseController {
   async getList() {
     return await this.prisma.$queryRawUnsafe(`
         select ash.id,
-
                m.id     memberId,
                ttl.levelTitle,
                tt.title questionnaireTitle,
