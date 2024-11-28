@@ -30,12 +30,12 @@ export class FormTemplateItemsController extends BaseController {
     const patternItems = await this.prisma.form_template_selection_pattern_items.findMany();
 
     const addedForms = (await this.prisma.form_template_items.findMany({
-      where:{
+      where: {
         OR: [
-          {type: FormInputTypes.RadioButton},
-          {type: FormInputTypes.SingleSelectionBox},
-        ]
-      }
+          { type: FormInputTypes.RadioButton },
+          { type: FormInputTypes.SingleSelectionBox },
+        ],
+      },
     })).map(f => {
       return {
         ...this.helper.getKeyValue(f.label, f.id),
@@ -286,6 +286,7 @@ export class FormTemplateItemsController extends BaseController {
         minimum: Number(input.minLength),
         maximum: Number(input.maxLength),
         isRequired: input.isRequired,
+        visibilityCondition: input.visibilityCondition,
       },
     }));
     await this.prisma.$transaction(transaction);
