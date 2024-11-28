@@ -29,7 +29,14 @@ export class FormTemplateItemsController extends BaseController {
 
     const patternItems = await this.prisma.form_template_selection_pattern_items.findMany();
 
-    const addedForms = (await this.prisma.form_template_items.findMany()).map(f => {
+    const addedForms = (await this.prisma.form_template_items.findMany({
+      where:{
+        OR: [
+          {type: FormInputTypes.RadioButton},
+          {type: FormInputTypes.SingleSelectionBox},
+        ]
+      }
+    })).map(f => {
       return {
         ...this.helper.getKeyValue(f.label, f.id),
         child: patternItems.filter(x => x.parentId == f.id).map(childItem => {
