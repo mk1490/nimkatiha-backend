@@ -31,4 +31,8 @@ export class CreateUpdateFormTemplateItemDto {
   isRequired: boolean;
 
 
+  @ApiProperty()
+  visibilityCondition: string;
+
+
 }

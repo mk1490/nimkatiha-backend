@@ -26,8 +26,24 @@ export class FormTemplateItemsController extends BaseController {
       this.helper.getKeyValue('تاریخ', FormInputTypes.DatePicker),
       // this.helper.getKeyValue('ساعت', FormInputTypes.TimePicker),
     ];
+
+    const patternItems = await this.prisma.form_template_selection_pattern_items.findMany();
+
+    const addedForms = (await this.prisma.form_template_items.findMany()).map(f => {
+      return {
+        ...this.helper.getKeyValue(f.label, f.id),
+        child: patternItems.filter(x => x.parentId == f.id).map(childItem => {
+          return {
+            ...this.helper.getKeyValue(childItem.text, childItem.id),
+            parentId: childItem.parentId,
+          };
+        }),
+      };
+    });
+
     return {
       formTypes,
+      addedForms,
     };
   }
 
@@ -114,7 +130,9 @@ export class FormTemplateItemsController extends BaseController {
         maximum: Number(input.maxLength),
         key: this.getKey(input.type),
         isRequired: input.isRequired,
+        visibilityCondition: input.visibilityCondition,
         order: lastOrderItem ? lastOrderItem.order + 1 : 0,
+
       },
     }));
 
@@ -128,7 +146,7 @@ export class FormTemplateItemsController extends BaseController {
       transactions.push(this.prisma.form_template_selection_pattern_items.createMany({
         data: input.items.map((f, i) => {
           return {
-            text: f,
+            text: f.title,
             value: i.toString(),
             parentId: id,
           };

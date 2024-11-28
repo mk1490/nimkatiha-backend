@@ -223,18 +223,20 @@ model form_templates {
 }
 
 model form_template_items {
-  id         String  @id() @default(uuid())
-  label      String
-  type       Int
-  size       Int
-  isRequired Boolean
-  minimum    Int?
-  maximum    Int?
-  key        String
-  parentId   String
-  order      Int     @default(-1)
-  metaData   String?
-  creatorId  String?
+  id                          String  @id() @default(uuid())
+  label                       String
+  type                        Int
+  size                        Int
+  isRequired                  Boolean
+  minimum                     Int?
+  maximum                     Int?
+  key                         String
+  parentId                    String
+  order                       Int     @default(-1)
+  metaData                    String?
+  visibilityCondition         String?
+  visibilityConditionChildren String?
+  creatorId                   String?
 }
 
 model form_template_selection_patterns {

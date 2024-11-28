@@ -104,6 +104,20 @@ export class CoreController extends BaseController {
               children = selectionPatternItems.filter(x => x.parentId == formItem.id);
             }
 
+
+            let visibilityCondition = null;
+
+            if (formItem.visibilityCondition) {
+              visibilityCondition = selectionPatternItems.find(x => x.id == formItem.visibilityCondition);
+
+              visibilityCondition = {
+                key: formTemplateItem.find(x => x.id == visibilityCondition.parentId).key,
+                value: visibilityCondition.value,
+              };
+
+            }
+
+
             return {
               size: `v-col-${formItem.size}`,
               label: formItem.label,
@@ -112,6 +126,7 @@ export class CoreController extends BaseController {
               minimum: formItem.minimum,
               maximum: formItem.maximum,
               isRequired: formItem.isRequired,
+              visibilityCondition: visibilityCondition,
               children: children,
             };
           }),
