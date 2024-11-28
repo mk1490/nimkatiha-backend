@@ -1,17 +1,6 @@
-import { Body, Controller, Get, Headers, NotAcceptableException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Headers, Query } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
-import * as fs from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
 import { SettingsService } from '../../../service/settings/settings.service';
-import { fileExistsSync } from 'tsconfig-paths/lib/filesystem';
-import { CurrentUser } from '../../../base/decorators/current-user.decorator';
-import { CurrentUserModel } from '../../../base/interfaces/current-user.interface';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/jwt-auth-guard';
-import { IncreaseDepositDto } from './dto/increase-deposit-dto';
-import { CalculateRateDto } from './dto/calculate-rate-dto';
-import * as test from 'node:test';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constants';
 import { FormInputTypes } from '../../../base/enums/formInputTypes';
@@ -108,8 +97,7 @@ export class CoreController extends BaseController {
             let visibilityCondition = null;
 
             if (formItem.visibilityCondition) {
-              visibilityCondition = selectionPatternItems.find(x => x.id == formItem.visibilityCondition);
-
+              visibilityCondition = selectionPatternItems.find(x => x.id == formItem.visibilityConditionValue);
               visibilityCondition = {
                 key: formTemplateItem.find(x => x.id == visibilityCondition.parentId).key,
                 value: visibilityCondition.value,
@@ -134,5 +122,4 @@ export class CoreController extends BaseController {
       }),
     };
   }
-
 }
