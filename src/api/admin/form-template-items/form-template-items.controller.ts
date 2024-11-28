@@ -138,6 +138,7 @@ export class FormTemplateItemsController extends BaseController {
         key: this.getKey(input.type),
         isRequired: input.isRequired,
         visibilityCondition: input.visibilityCondition,
+        visibilityConditionValue: input.visibilityConditionValue,
         order: lastOrderItem ? lastOrderItem.order + 1 : 0,
 
       },
@@ -287,6 +288,7 @@ export class FormTemplateItemsController extends BaseController {
         maximum: Number(input.maxLength),
         isRequired: input.isRequired,
         visibilityCondition: input.visibilityCondition,
+        visibilityConditionValue: input.visibilityConditionValue,
       },
     }));
     await this.prisma.$transaction(transaction);
@@ -301,16 +303,19 @@ export class FormTemplateItemsController extends BaseController {
 
   @Delete('/:id')
   async delete(@Param('id') id) {
-    const transactions = [];
-    transactions.push(this.prisma.form_templates.deleteMany({
+
+    const formTemplateItem = await this.prisma.form_template_items.findFirst({
       where: {
-        id: id,
+        id,
       },
-    }));
+    });
+
+
+    const transactions = [];
 
     transactions.push(this.prisma.form_template_items.deleteMany({
       where: {
-        parentId: id,
+        id: formTemplateItem.id,
       },
     }));
 

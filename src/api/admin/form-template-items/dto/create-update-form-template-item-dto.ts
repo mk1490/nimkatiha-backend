@@ -34,5 +34,6 @@ export class CreateUpdateFormTemplateItemDto {
   @ApiProperty()
   visibilityCondition: string;
 
-
+  @ApiProperty()
+  visibilityConditionValue: string;
 }
