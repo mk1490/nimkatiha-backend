@@ -272,3 +272,27 @@ model answer_sheet_items {
   parentAnswerSheetId String
   creationTime        DateTime @default(now())
 }
+
+model tests {
+  id           String   @id() @default(uuid())
+  title        String
+  slug         String
+  creationTime DateTime @default(now())
+}
+
+model test_questions {
+  id              String   @id() @default(uuid())
+  parentId        String
+  questionTitle   String
+  questionType    Int
+  correctAnswerId String?
+  creationTime    DateTime @default(now())
+}
+
+model test_question_answer_items {
+  id                   String   @id() @default(uuid())
+  parentTestQuestionId String
+  label                String
+  value                String
+  creationTime         DateTime @default(now())
+}

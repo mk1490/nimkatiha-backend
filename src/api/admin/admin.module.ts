@@ -18,6 +18,8 @@ import { TestTemplateController } from './test-template/test-template.controller
 import { FormTemplateController } from './form-template/form-template.controller';
 import { FormTemplateItemsController } from './form-template-items/form-template-items.controller';
 import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
+import { TestController } from './test/test.controller';
+import { TestQuestionController } from './test-question/test-question.controller';
 
 @Module({
   controllers: [
@@ -34,6 +36,8 @@ import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
     FormTemplateController,
     FormTemplateItemsController,
     AnswerSheetController,
+    TestController,
+    TestQuestionController,
   ],
   providers: [
     AccessPermissionService,

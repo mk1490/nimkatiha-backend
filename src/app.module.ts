@@ -47,7 +47,7 @@ import {NotificationService} from "./service/notification/notification.service";
     ],
     controllers: [
         AppController,
-        AuthController
+        AuthController,
     ],
     providers: [
         AppService,
