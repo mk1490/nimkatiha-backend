@@ -5,5 +5,5 @@ export class CreateUpdatePublishedTestDto {
   testId: string;
 
   @ApiProperty()
-  randomNumbersCount: number;
+  isRandom: boolean;
 }

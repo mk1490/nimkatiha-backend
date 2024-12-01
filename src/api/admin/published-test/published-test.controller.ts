@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdatePublishedTestDto } from './dto/create-update-published-test-dto';
-import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 
 @Controller('published-test')
 export class PublishedTestController extends BaseController {
@@ -30,7 +29,6 @@ export class PublishedTestController extends BaseController {
       }
     })*/
 
-
     return await this.prisma.published_tests.findMany();
   }
 
@@ -39,7 +37,7 @@ export class PublishedTestController extends BaseController {
     return await this.prisma.published_tests.create({
       data: {
         testTemplateId: input.testId,
-        randomNumbersCount: input.randomNumbersCount,
+        isRandom: input.isRandom,
       },
     });
   }
