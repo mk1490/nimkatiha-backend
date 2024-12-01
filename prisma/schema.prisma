@@ -276,7 +276,8 @@ model answer_sheet_items {
 model tests {
   id           String   @id() @default(uuid())
   title        String
-  slug         String
+  slug         String?
+  time         Int
   creationTime DateTime @default(now())
 }
 

@@ -7,5 +7,8 @@ export class CreateUpdateTestDto {
   @ApiProperty()
   slug: string;
 
+  @ApiProperty()
+  time: number;
+
 
 }

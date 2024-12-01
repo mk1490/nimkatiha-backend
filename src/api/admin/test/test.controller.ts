@@ -42,12 +42,16 @@ export class TestController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdateTestDto) {
-    return await this.prisma.tests.create({
-      data: {
-        title: input.title,
-        slug: input.slug,
-      },
-    });
+    return {
+      ...await this.prisma.tests.create({
+        data: {
+          title: input.title,
+          slug: input.slug,
+          time: Number(input.time),
+        },
+      }),
+      questionsCount: 0,
+    };
   }
 
 }
