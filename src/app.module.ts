@@ -18,6 +18,7 @@ import {join} from "path";
 import {homedir} from "os";
 import {AccessPermissionService} from "./service/access-permission/access-permission.service";
 import {NotificationService} from "./service/notification/notification.service";
+import { PublishedTestsController } from './published-tests/published-tests.controller';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import {NotificationService} from "./service/notification/notification.service";
     controllers: [
         AppController,
         AuthController,
+        PublishedTestsController,
     ],
     providers: [
         AppService,

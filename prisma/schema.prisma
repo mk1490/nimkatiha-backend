@@ -297,3 +297,9 @@ model test_question_answer_items {
   value                String
   creationTime         DateTime @default(now())
 }
+
+model published_tests {
+  id             String   @id() @default(uuid())
+  testTemplateId String
+  creationTime   DateTime @default(now())
+}

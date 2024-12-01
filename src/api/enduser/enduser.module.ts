@@ -11,9 +11,10 @@ import { MemberRequestController } from './member-request/member-request.control
 import { CoreService } from '../../service/core/core.service';
 import { JwtService } from '@nestjs/jwt';
 import { FormAnswerController } from './form-answer/form-answer.controller';
+import { TestController } from './test/test.controller';
 
 @Module({
-  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController],
+  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController, TestController],
   providers: [
     SettingsService,
     SmsService,
