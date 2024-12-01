@@ -299,9 +299,10 @@ model test_question_answer_items {
 }
 
 model published_tests {
-  id             String   @id() @default(uuid())
-  testTemplateId String
-  creationTime   DateTime @default(now())
+  id                 String   @id() @default(uuid())
+  testTemplateId     String
+  randomNumbersCount Int
+  creationTime       DateTime @default(now())
 }
 
 model answered_tests {

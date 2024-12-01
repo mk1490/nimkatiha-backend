@@ -10,6 +10,16 @@ export class AnsweredTestsController extends BaseController {
 
   @Get('/list')
   async getList() {
-    // await this.prisma.answered_tests.i
+    return await this.prisma.$queryRawUnsafe(`
+        select m.id,
+               m.mobileNumber,
+               t.title testTitle,
+               at.creationTime
+        from answered_tests at
+         inner join members m
+        on m.id = at.userId
+            inner join tests t on t.id = at.testId
+    `);
   }
+
 }

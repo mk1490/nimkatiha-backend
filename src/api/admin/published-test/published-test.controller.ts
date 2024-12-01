@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdatePublishedTestDto } from './dto/create-update-published-test-dto';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
@@ -39,6 +39,16 @@ export class PublishedTestController extends BaseController {
     return await this.prisma.published_tests.create({
       data: {
         testTemplateId: input.testId,
+        randomNumbersCount: input.randomNumbersCount,
+      },
+    });
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id) {
+    await this.prisma.published_tests.delete({
+      where: {
+        id,
       },
     });
   }
