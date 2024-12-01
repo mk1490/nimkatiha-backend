@@ -285,6 +285,7 @@ model test_questions {
   parentId        String
   questionTitle   String
   questionType    Int
+  questionScore   Int
   correctAnswerId String?
   creationTime    DateTime @default(now())
 }

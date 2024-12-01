@@ -15,4 +15,7 @@ export class CreateUpdateTestQuestionDto {
 
   @ApiProperty()
   correctAnswer: number;
+
+  @ApiProperty()
+  score: number;
 }
