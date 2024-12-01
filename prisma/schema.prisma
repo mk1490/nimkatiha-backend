@@ -307,10 +307,13 @@ model published_tests {
 }
 
 model answered_tests {
-  id           String   @id() @default(uuid())
-  testId       String
-  userId       String
-  creationTime DateTime @default(now())
+  id            String   @id() @default(uuid())
+  status        Int
+  testId        String
+  userId        String
+  endTime       DateTime
+  stringifyData String?
+  creationTime  DateTime @default(now())
 }
 
 model answered_test_items {

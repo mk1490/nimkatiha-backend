@@ -2,6 +2,7 @@ import { Body, Controller, Get, NotAcceptableException, Param, Post } from '@nes
 import { BaseController } from '../../../base/base-controller';
 import { TestDto } from './dto/test-dto';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
+import * as test from 'node:test';
 
 @Controller('test')
 export class TestController extends BaseController {
@@ -34,7 +35,9 @@ export class TestController extends BaseController {
 
 
   @Get('/initialize/:id')
-  async initialize(@Param('id') id) {
+  async initialize(
+    @CurrentMember() currentMember,
+    @Param('id') id) {
     const testItem = await this.prisma.tests.findFirst({
       where: {
         id: id,
@@ -43,6 +46,31 @@ export class TestController extends BaseController {
 
     if (!testItem)
       throw new NotAcceptableException('لینک آژمون درخواستی معتبر نیست');
+
+
+    const answerTestItem = await this.prisma.answered_tests.findFirst({
+      where: {
+        userId: currentMember.id,
+        testId: testItem.id,
+      },
+    });
+
+
+    if (!answerTestItem) {
+      let endTime = new Date();
+      endTime.setMinutes(endTime.getMinutes() + testItem.time);
+      await this.prisma.answered_tests.create({
+        data: {
+          testId: testItem.id,
+          status: 1,
+          endTime: endTime,
+          userId: currentMember.id,
+        },
+      });
+    } else {
+      if (answerTestItem.endTime > new Date())
+        throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
+    }
 
 
     const questions = await this.prisma.test_questions.findMany({
@@ -92,13 +120,14 @@ export class TestController extends BaseController {
     const id = this.helper.generateUuid();
 
     const transactions = [];
-    transactions.push(this.prisma.answered_tests.create({
-      data: {
-        id,
-        testId: input.testId,
-        userId: currentMember.id,
-      },
-    }));
+    /* transactions.push(this.prisma.answered_tests.create({
+       data: {
+         id,
+         testId: input.testId,
+         userId: currentMember.id,
+         status: 1,
+       },
+     }));*/
 
 
     let dataItems = [];
