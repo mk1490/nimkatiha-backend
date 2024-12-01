@@ -21,6 +21,7 @@ import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
 import { TestController } from './test/test.controller';
 import { TestQuestionController } from './test-question/test-question.controller';
 import { PublishedTestController } from './published-test/published-test.controller';
+import { AnsweredTestsController } from './answered-tests/answered-tests.controller';
 
 @Module({
   controllers: [
@@ -40,6 +41,7 @@ import { PublishedTestController } from './published-test/published-test.control
     TestController,
     TestQuestionController,
     PublishedTestController,
+    AnsweredTestsController,
   ],
   providers: [
     AccessPermissionService,

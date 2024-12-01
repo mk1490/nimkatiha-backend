@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdatePublishedTestDto } from './dto/create-update-published-test-dto';
+import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 
 @Controller('published-test')
 export class PublishedTestController extends BaseController {
@@ -20,7 +21,16 @@ export class PublishedTestController extends BaseController {
   }
 
   @Get('/list')
-  async getList() {
+  async getList(/*@CurrentMember() currentMember*/) {
+
+
+    /*await this.prisma.answered_tests.findMany({
+      where:{
+        userId:
+      }
+    })*/
+
+
     return await this.prisma.published_tests.findMany();
   }
 

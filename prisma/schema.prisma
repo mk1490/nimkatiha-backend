@@ -303,3 +303,18 @@ model published_tests {
   testTemplateId String
   creationTime   DateTime @default(now())
 }
+
+model answered_tests {
+  id           String   @id() @default(uuid())
+  testId       String
+  userId       String
+  creationTime DateTime @default(now())
+}
+
+model answered_test_items {
+  id                 String   @id() @default(uuid())
+  questionId         String
+  answerContent      String?
+  parentAnswerItemId String?
+  creationTime       DateTime @default(now())
+}
