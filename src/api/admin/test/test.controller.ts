@@ -11,7 +11,13 @@ export class TestController extends BaseController {
 
   @Get('/list')
   async getList() {
-    return await this.prisma.tests.findMany();
+    const testQuestions = await this.prisma.test_questions.findMany();
+
+    const items = await this.prisma.tests.findMany();
+    return items.map(f => {
+      f['questionsCount'] = testQuestions.filter(x => x.parentId == f.id).length;
+      return f;
+    });
   }
 
 
@@ -22,7 +28,11 @@ export class TestController extends BaseController {
         id,
       },
     });
-    const questions = await this.prisma.test_questions.findMany();
+    const questions = await this.prisma.test_questions.findMany({
+      where: {
+        parentId: item.id,
+      },
+    });
     return {
       ...item,
       questions,
@@ -30,13 +40,12 @@ export class TestController extends BaseController {
   }
 
 
-
   @Post()
   async create(@Body() input: CreateUpdateTestDto) {
     return await this.prisma.tests.create({
       data: {
         title: input.title,
-        slug: input.slug
+        slug: input.slug,
       },
     });
   }
