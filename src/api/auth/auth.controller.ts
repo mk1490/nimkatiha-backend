@@ -63,8 +63,9 @@ export class AuthController extends BaseController {
       }
     }
     const randomNumber = Math.random().toString().substr(2, 6);
+    console.log(randomNumber);
     try {
-      await this.smsService.sendOtpCode(mobileNumber, randomNumber);
+      // await this.smsService.sendOtpCode(mobileNumber, randomNumber);
     } catch (e) {
       console.log(e);
     }

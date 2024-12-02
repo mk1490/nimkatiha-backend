@@ -8,6 +8,7 @@ export class SmsService extends BaseService {
 
 
   async sendOtpCode(phoneNumber, verifyCode) {
+
     // @ts-ignore
     if (!process.env.DEVELOPMENT_MODE || process.env.DEVELOPMENT_MODE != true) {
       await this.sendSms(phoneNumber,
