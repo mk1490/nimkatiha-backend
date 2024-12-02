@@ -324,3 +324,11 @@ model answered_test_items {
   parentAnswerItemId String?
   creationTime       DateTime @default(now())
 }
+
+model questionnaire_members {
+  id              String   @id() @default(uuid())
+  questionnaireId String
+  memberId        String
+  status          Int
+  creationTime    DateTime @default(now())
+}

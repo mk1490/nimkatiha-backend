@@ -12,9 +12,10 @@ import { CoreService } from '../../service/core/core.service';
 import { JwtService } from '@nestjs/jwt';
 import { FormAnswerController } from './form-answer/form-answer.controller';
 import { TestController } from './test/test.controller';
+import { QuestionnaireController } from './questionnaire/questionnaire.controller';
 
 @Module({
-  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController, TestController],
+  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController, TestController, QuestionnaireController],
   providers: [
     SettingsService,
     SmsService,
