@@ -179,14 +179,12 @@ export class TestTemplateController extends BaseController {
       },
     });
 
-    console.log(item);
-
     transactions.push(this.prisma.test_templates.delete({
       where: {
         id,
       },
     }));
-    
+
 
     await this.prisma.$transaction(transactions);
   }
