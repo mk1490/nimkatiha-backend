@@ -70,13 +70,13 @@ export class UserController extends BaseController {
       throw new NotFoundException();
 
     delete item.password;
-    const user_available_questionnairies = await this.prisma.user_available_questionnairies.findMany({
-      where: {
-        userId: item.id,
-      },
-    });
-
-    item['availableTemplates'] = user_available_questionnairies.map(f => f.questionnaireId);
+    // const user_available_questionnairies = await this.prisma.user_available_questionnairies.findMany({
+    //   where: {
+    //     userId: item.id,
+    //   },
+    // });
+    //
+    // item['availableTemplates'] = user_available_questionnairies.map(f => f.questionnaireId);
 
     return {
       result: item,

@@ -21,10 +21,8 @@ export class PublishedTestController extends BaseController {
 
   @Get('/list')
   async getList(/*@CurrentMember() currentMember*/) {
-
-
     return await this.prisma.$queryRawUnsafe(`
-        select t.title
+        select pt.id, t.title, pt.isRandom
         from published_tests pt
                  inner join tests t on pt.testTemplateId = t.id
     `);
@@ -48,11 +46,13 @@ export class PublishedTestController extends BaseController {
     return {
       id: item.id,
       title: testItem.title,
+      isRandom: item.isRandom,
     };
   }
 
   @Delete('/:id')
   async delete(@Param('id') id) {
+    console.log(id);
     await this.prisma.published_tests.delete({
       where: {
         id,
