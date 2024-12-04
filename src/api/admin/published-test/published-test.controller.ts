@@ -23,23 +23,32 @@ export class PublishedTestController extends BaseController {
   async getList(/*@CurrentMember() currentMember*/) {
 
 
-    /*await this.prisma.answered_tests.findMany({
-      where:{
-        userId:
-      }
-    })*/
-
-    return await this.prisma.published_tests.findMany();
+    return await this.prisma.$queryRawUnsafe(`
+        select t.title
+        from published_tests pt
+                 inner join tests t on pt.testTemplateId = t.id
+    `);
   }
 
   @Post()
   async create(@Body() input: CreateUpdatePublishedTestDto) {
-    return await this.prisma.published_tests.create({
+    const item = await this.prisma.published_tests.create({
       data: {
         testTemplateId: input.testId,
         isRandom: input.isRandom,
       },
     });
+
+    const testItem = await this.prisma.tests.findFirst({
+      where: {
+        id: item.testTemplateId,
+      },
+    });
+
+    return {
+      id: item.id,
+      title: testItem.title,
+    };
   }
 
   @Delete('/:id')

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateTestDto } from './dto/create-update-test-dto';
 
@@ -48,6 +48,24 @@ export class TestController extends BaseController {
           title: input.title,
           slug: input.slug,
           time: Number(input.time),
+        },
+      }),
+      questionsCount: 0,
+    };
+  }
+
+  @Put('/:id')
+  async update(
+    @Param('id') id,
+    @Body() input: CreateUpdateTestDto) {
+    return {
+      ...await this.prisma.tests.update({
+        data: {
+          title: input.title,
+          time: Number(input.time),
+        },
+        where: {
+          id,
         },
       }),
       questionsCount: 0,
