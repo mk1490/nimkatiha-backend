@@ -26,7 +26,6 @@ export class AnsweredTestsController extends BaseController {
   @Get('/:id')
   async getDetails(
     @Param('id') id) {
-    const tests = await this.prisma.tests.findMany();
     const item = await this.prisma.answered_tests.findFirst({
       where: {
         id,
@@ -34,16 +33,8 @@ export class AnsweredTestsController extends BaseController {
     });
 
 
-    const answered_test_items = await this.prisma.answered_test_items.findMany({
-      where: {
-        parentAnswerItemId: item.id,
-      },
-    });
-
-
     return {
-      item,
-      
+      ...JSON.parse(item.stringifyData),
     };
 
   }
