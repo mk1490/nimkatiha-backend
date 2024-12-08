@@ -34,6 +34,7 @@ export class PublishedTestController extends BaseController {
       data: {
         testTemplateId: input.testId,
         isRandom: input.isRandom,
+        questionRandomNumbers: Number(input.randomCountNumbers)
       },
     });
 

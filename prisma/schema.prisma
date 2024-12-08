@@ -300,10 +300,11 @@ model test_question_answer_items {
 }
 
 model published_tests {
-  id             String   @id() @default(uuid())
-  testTemplateId String
-  isRandom       Boolean
-  creationTime   DateTime @default(now())
+  id                    String   @id() @default(uuid())
+  testTemplateId        String
+  isRandom              Boolean
+  questionRandomNumbers Int?
+  creationTime          DateTime @default(now())
 }
 
 model answered_tests {
@@ -312,7 +313,7 @@ model answered_tests {
   testId        String
   userId        String
   endTime       DateTime
-  stringifyData String?
+  stringifyData String?  @db.LongText
   creationTime  DateTime @default(now())
 }
 
