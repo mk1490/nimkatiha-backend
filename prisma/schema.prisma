@@ -317,14 +317,14 @@ model published_test_question_items {
   creationTime          DateTime @default(now())
 }
 
-model answered_tests {
-  id            String   @id() @default(uuid())
-  status        Int
-  testId        String
-  userId        String
-  endTime       DateTime
-  stringifyData String?  @db.LongText
-  creationTime  DateTime @default(now())
+model member_answered_tests {
+  id                  String   @id() @default(uuid())
+  status              Int
+  publishedTestItemId String
+  userId              String
+  endTime             DateTime
+  stringifyData       String?  @db.LongText
+  creationTime        DateTime @default(now())
 }
 
 model answered_test_items {

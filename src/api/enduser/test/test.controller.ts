@@ -21,7 +21,7 @@ export class TestController extends BaseController {
         isActive: true,
       },
     });
-    const answeredTests = await this.prisma.answered_tests.findMany({
+    const answeredTests = await this.prisma.member_answered_tests.findMany({
       where: {
         userId: currentMember.id,
       },
@@ -34,7 +34,7 @@ export class TestController extends BaseController {
     return publishedTests.map(f => {
       const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
       const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
-      let status = !!answeredTests.find(x => x.testId == testItem.id && x.status == TestStatuses.Success);
+      let status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
       return {
         id: f.id,
         title: f.title,
@@ -61,10 +61,10 @@ export class TestController extends BaseController {
       throw new NotAcceptableException('لینک آژمون درخواستی معتبر نیست');
 
 
-    const answerTestItem = await this.prisma.answered_tests.findFirst({
+    const answerTestItem = await this.prisma.member_answered_tests.findFirst({
       where: {
         userId: currentMember.id,
-        testId: publishedTestId.id,
+        publishedTestItemId: publishedTestItem.id,
       },
     });
     if (answerTestItem && answerTestItem.endTime < new Date())
@@ -101,33 +101,33 @@ export class TestController extends BaseController {
       questions.push(...tempQuestions);
 
 
-      const endTime = new Date();
-      endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
-
-      const id = this.helper.generateUuid();
-
-      transactions.push(this.prisma.answered_tests.create({
-        data: {
-          id,
-          testId: testItem.id,
-          status: TestStatuses.Incomplete,
-          endTime: endTime,
-          userId: currentMember.id,
-        },
-      }));
+    }));
 
 
-      transactions.push(this.prisma.answered_test_items.createMany({
-        data: tempQuestions.map(questionItem => {
-          return {
-            questionId: questionItem.id,
-            answerContent: null,
-            parentAnswerItemId: id,
-          };
-        }),
-      }));
+    const id = this.helper.generateUuid();
+
+    const endTime = new Date();
+    endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
+
+    transactions.push(this.prisma.member_answered_tests.create({
+      data: {
+        id,
+        publishedTestItemId: publishedTestItem.id,
+        status: TestStatuses.Incomplete,
+        endTime: endTime,
+        userId: currentMember.id,
+      },
+    }));
 
 
+    transactions.push(this.prisma.answered_test_items.createMany({
+      data: questions.map(questionItem => {
+        return {
+          questionId: questionItem.id,
+          answerContent: null,
+          parentAnswerItemId: id,
+        };
+      }),
     }));
 
 
@@ -138,6 +138,7 @@ export class TestController extends BaseController {
 
     return {
       title: publishedTestItem.title,
+      endDescription: publishedTestItem.endDescription,
       questions: questions.map(f => {
         return {
           id: f.id,
@@ -161,44 +162,29 @@ export class TestController extends BaseController {
     @Body() input: TestDto) {
 
 
-    const item = await this.prisma.answered_tests.findFirst({
+    const item = await this.prisma.member_answered_tests.findFirst({
       where: {
-        testId: input.testId,
+        publishedTestItemId: input.testId,
         userId: currentMember.id,
-        status: TestStatuses.Success,
       },
     });
 
-    if (item) {
+    if (item && item.status == TestStatuses.Success)
       throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
-    }
-
-
-    const answerTestItem = await this.prisma.answered_tests.findFirst({
-      where: {
-        testId: input.testId,
-        userId: currentMember.id,
-      },
-    });
 
 
     const questions = await this.prisma.test_questions.findMany();
     const testQuestionAnswerItems = await this.prisma.test_question_answer_items.findMany();
-
-
     const transactions = [];
-    transactions.push(this.prisma.answered_tests.updateMany({
+    transactions.push(this.prisma.member_answered_tests.updateMany({
       where: {
-        id: answerTestItem.id,
+        id: item.id,
       },
       data: {
         status: TestStatuses.Success,
       },
     }));
-
     let stringifyAnswerItems = [];
-
-
     Object.keys(input.items).map(objectKey => {
       const answer = input.items[objectKey];
 
@@ -208,7 +194,7 @@ export class TestController extends BaseController {
       transactions.push(this.prisma.answered_test_items.updateMany({
         where: {
           questionId: questionId,
-          parentAnswerItemId: answerTestItem.id,
+          parentAnswerItemId: item.id,
         },
         data: {
           answerContent: answer ? answer.toString() : null,
@@ -229,18 +215,14 @@ export class TestController extends BaseController {
       });
 
     });
-
-
-    transactions.push(this.prisma.answered_tests.update({
+    transactions.push(this.prisma.member_answered_tests.update({
       where: {
-        id: answerTestItem.id,
+        id: item.id,
       },
       data: {
         stringifyData: JSON.stringify(stringifyAnswerItems),
       },
     }));
-
-
     await this.prisma.$transaction(transactions);
   }
 
