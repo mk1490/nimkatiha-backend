@@ -32,14 +32,16 @@ export class TestController extends BaseController {
 
     return publishedTests.map(f => {
       const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
-      const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
-      let status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
-      return {
-        id: f.id,
-        title: f.title,
-        description: f.description,
-        status: status ? 1 : 0,
-      };
+      if (publishedTestItem){
+        const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
+        let status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
+        return {
+          id: f.id,
+          title: f.title,
+          description: f.description,
+          status: status ? 1 : 0,
+        };
+      }
     });
   }
 
