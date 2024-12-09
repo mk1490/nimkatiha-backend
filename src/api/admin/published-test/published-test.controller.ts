@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdatePublishedTestDto } from './dto/create-update-published-test-dto';
 
@@ -22,7 +22,7 @@ export class PublishedTestController extends BaseController {
   @Get('/list')
   async getList(/*@CurrentMember() currentMember*/) {
     return await this.prisma.$queryRawUnsafe(`
-        select pt.id, t.title, pt.isRandom
+        select pt.id, t.title, pt.isRandom, pt.isActive
         from published_tests pt
                  inner join tests t on pt.testTemplateId = t.id
     `);
@@ -30,30 +30,76 @@ export class PublishedTestController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdatePublishedTestDto) {
-    const item = await this.prisma.published_tests.create({
+    const transactions = [];
+
+
+    const id = this.helper.generateUuid();
+
+    transactions.push(this.prisma.published_tests.create({
       data: {
-        testTemplateId: input.testId,
-        isRandom: input.isRandom,
-        questionRandomNumbers: Number(input.randomCountNumbers)
+        id,
+        title: input.title,
+        description: input.description,
+        endDescription: input.endDescription,
+        time: Number(input.time),
+        isActive: true,
       },
-    });
+    }));
 
-    const testItem = await this.prisma.tests.findFirst({
+
+    transactions.push(this.prisma.published_test_question_items.createMany({
+      data: input.items.map(f => {
+        return {
+          parentPublishedTestId: id,
+          testTemplateId: f.testId,
+          isRandom: f.isRandom,
+          questionRandomNumbers: f.randomCountNumbers,
+        };
+      }),
+    }));
+
+    await this.prisma.$transaction(transactions);
+
+
+    const item = await this.prisma.published_tests.findFirst({
       where: {
-        id: item.testTemplateId,
+        id,
       },
     });
-
+    
     return {
       id: item.id,
-      title: testItem.title,
-      isRandom: item.isRandom,
+      title: item.title,
+      count: await this.prisma.published_test_question_items.count({
+        where: {
+          parentPublishedTestId: id,
+        },
+      }),
     };
   }
 
+
+  @Put('/change-status/:id')
+  async changeStatus(
+    @Param('id') id,
+    @Body('status') status: boolean,
+  ) {
+
+    await this.prisma.published_tests.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: Boolean(status),
+      },
+    });
+
+
+  }
+
+
   @Delete('/:id')
   async delete(@Param('id') id) {
-    console.log(id);
     await this.prisma.published_tests.delete({
       where: {
         id,

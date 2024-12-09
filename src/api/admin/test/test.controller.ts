@@ -47,7 +47,6 @@ export class TestController extends BaseController {
         data: {
           title: input.title,
           slug: input.slug,
-          time: Number(input.time),
         },
       }),
       questionsCount: 0,
@@ -62,7 +61,6 @@ export class TestController extends BaseController {
       ...await this.prisma.tests.update({
         data: {
           title: input.title,
-          time: Number(input.time),
         },
         where: {
           id,

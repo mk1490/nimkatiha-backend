@@ -16,7 +16,11 @@ export class TestController extends BaseController {
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
     const items = await this.prisma.tests.findMany();
-    const publishedTests = await this.prisma.published_tests.findMany();
+    const publishedTests = await this.prisma.published_tests.findMany({
+      where: {
+        isActive: true,
+      },
+    });
     const answeredTests = await this.prisma.answered_tests.findMany({
       where: {
         userId: currentMember.id,
@@ -82,7 +86,7 @@ export class TestController extends BaseController {
 
     if (!answerTestItem) {
       let endTime = new Date();
-      endTime.setMinutes(endTime.getMinutes() + testItem.time);
+      endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
 
 
       const id = this.helper.generateUuid();

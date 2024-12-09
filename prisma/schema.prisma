@@ -277,7 +277,6 @@ model tests {
   id           String   @id() @default(uuid())
   title        String
   slug         String?
-  time         Int
   creationTime DateTime @default(now())
 }
 
@@ -300,10 +299,21 @@ model test_question_answer_items {
 }
 
 model published_tests {
+  id             String   @id() @default(uuid())
+  title          String?
+  description    String?
+  endDescription String?
+  time           Int?
+  isActive       Boolean  @default(true)
+  creationTime   DateTime @default(now())
+}
+
+model published_test_question_items {
   id                    String   @id() @default(uuid())
   testTemplateId        String
   isRandom              Boolean
   questionRandomNumbers Int?
+  parentPublishedTestId String
   creationTime          DateTime @default(now())
 }
 
