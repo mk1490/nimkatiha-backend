@@ -30,7 +30,6 @@ export class TestController extends BaseController {
 
     const publishedTestItems = await this.prisma.published_test_question_items.findMany();
 
-
     return publishedTests.map(f => {
       const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
       const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
@@ -38,6 +37,7 @@ export class TestController extends BaseController {
       return {
         id: f.id,
         title: f.title,
+        description: f.description,
         status: status ? 1 : 0,
       };
     });

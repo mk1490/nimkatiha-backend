@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotAcceptableException, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdatePublishedTestDto } from './dto/create-update-published-test-dto';
 
@@ -34,6 +34,32 @@ export class PublishedTestController extends BaseController {
     });
   }
 
+
+  @Get('/:id')
+  async getDetails(@Param('id') id) {
+    const data = await this.prisma.published_tests.findFirst({
+      where: {
+        id,
+      },
+    });
+
+
+    if (!data)
+      throw new NotAcceptableException('شناسه درخواستی معتبر نیست.');
+
+    data['items'] = await this.prisma.published_test_question_items.findMany({
+      where: {
+        parentPublishedTestId: data.id,
+      },
+    });
+
+    return {
+      data,
+      initialize: await this.initialize(),
+    };
+  }
+
+
   @Post()
   async create(@Body() input: CreateUpdatePublishedTestDto) {
     const transactions = [];
@@ -52,6 +78,63 @@ export class PublishedTestController extends BaseController {
       },
     }));
 
+
+    transactions.push(this.prisma.published_test_question_items.createMany({
+      data: input.items.map(f => {
+        return {
+          parentPublishedTestId: id,
+          testTemplateId: f.testId,
+          isRandom: f.isRandom,
+          questionRandomNumbers: Number(f.randomCount),
+        };
+      }),
+    }));
+
+    await this.prisma.$transaction(transactions);
+
+
+    const item = await this.prisma.published_tests.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      id: item.id,
+      title: item.title,
+      count: await this.prisma.published_test_question_items.count({
+        where: {
+          parentPublishedTestId: id,
+        },
+      }),
+    };
+  }
+
+
+  @Put('/:id')
+  async update(
+    @Param('id') id,
+    @Body() input: CreateUpdatePublishedTestDto) {
+    const transactions = [];
+
+    transactions.push(this.prisma.published_tests.update({
+      where: {
+        id,
+      },
+      data: {
+        title: input.title,
+        description: input.description,
+        endDescription: input.endDescription,
+        time: Number(input.time),
+        isActive: true,
+      },
+    }));
+
+    transactions.push(this.prisma.published_test_question_items.deleteMany({
+      where:{
+        parentPublishedTestId: id,
+      }
+    }))
 
     transactions.push(this.prisma.published_test_question_items.createMany({
       data: input.items.map(f => {
