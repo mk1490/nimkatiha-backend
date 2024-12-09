@@ -28,66 +28,81 @@ export class TestController extends BaseController {
     });
 
 
-    return publishedTests.map(f => {
+    const publishedTestItems = await this.prisma.published_test_question_items.findMany();
 
-      const testItem = items.find(x => x.id == f.testTemplateId);
+
+    return publishedTests.map(f => {
+      const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
+      const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
       let status = !!answeredTests.find(x => x.testId == testItem.id && x.status == TestStatuses.Success);
       return {
-        id: testItem.id,
-        title: testItem.title,
-        slug: testItem.slug,
+        id: f.id,
+        title: f.title,
         status: status ? 1 : 0,
       };
     });
   }
 
 
-  @Get('/initialize/:id')
+  @Get('/initialize/:publishedTestId')
   async initialize(
     @CurrentMember() currentMember,
-    @Param('id') id) {
-    const testItem = await this.prisma.tests.findFirst({
-      where: {
-        id: id,
-      },
-    });
-
-    if (!testItem)
-      throw new NotAcceptableException('لینک آژمون درخواستی معتبر نیست');
+    @Param('publishedTestId') publishedTestId) {
 
 
     const publishedTestItem = await this.prisma.published_tests.findFirst({
       where: {
-        testTemplateId: testItem.id,
+        id: publishedTestId,
       },
     });
+
+
+    if (!publishedTestItem)
+      throw new NotAcceptableException('لینک آژمون درخواستی معتبر نیست');
 
 
     const answerTestItem = await this.prisma.answered_tests.findFirst({
       where: {
         userId: currentMember.id,
-        testId: testItem.id,
+        testId: publishedTestId.id,
       },
     });
-
-
-    let questions = await this.prisma.test_questions.findMany({
-      where: {
-        parentId: testItem.id,
-      },
-    });
+    if (answerTestItem && answerTestItem.endTime < new Date())
+      throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
+    else if (answerTestItem && answerTestItem.status === TestStatuses.Success)
+      throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
 
 
     const transactions = [];
 
 
-    const shuffledArray = [...questions].sort(() => 0.5 - Math.random());
+    const publishedTestQuestionItems = await this.prisma.published_test_question_items.findMany({
+      where: {
+        parentPublishedTestId: publishedTestItem.id,
+      },
+    });
+
+    const testItems = await this.prisma.tests.findMany();
 
 
-    if (!answerTestItem) {
-      let endTime = new Date();
+    let questions = [];
+
+    await Promise.all(publishedTestQuestionItems.map(async (f) => {
+      const testItem = testItems.find(x => x.id == f.testTemplateId);
+      let tempQuestions = await this.prisma.test_questions.findMany({
+        where: {
+          parentId: testItem.id,
+        },
+      });
+
+      if (f.isRandom)
+        tempQuestions = [...tempQuestions].sort(() => 0.5 - Math.random()).slice(0, f.questionRandomNumbers);
+
+      questions.push(...tempQuestions);
+
+
+      const endTime = new Date();
       endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
-
 
       const id = this.helper.generateUuid();
 
@@ -102,11 +117,10 @@ export class TestController extends BaseController {
       }));
 
 
-      questions = shuffledArray.slice(0, publishedTestItem.questionRandomNumbers);
       transactions.push(this.prisma.answered_test_items.createMany({
-        data: questions.map(f => {
+        data: tempQuestions.map(questionItem => {
           return {
-            questionId: f.id,
+            questionId: questionItem.id,
             answerContent: null,
             parentAnswerItemId: id,
           };
@@ -114,44 +128,22 @@ export class TestController extends BaseController {
       }));
 
 
-    } else {
-      if (answerTestItem.endTime < new Date())
-        throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
-      if (answerTestItem.status === TestStatuses.Success)
-        throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
+    }));
 
-
-      const answeredTestItems = await this.prisma.answered_test_items.findMany({
-        where: {
-          parentAnswerItemId: answerTestItem.id,
-        },
-      });
-
-      questions = await this.prisma.test_questions.findMany({
-        where: {
-          id: {
-            in: answeredTestItems.map(f => f.questionId),
-          },
-        },
-      });
-
-
-    }
 
     await this.prisma.$transaction(transactions);
 
 
-    const items = await this.prisma.test_question_answer_items.findMany();
-
+    const answerItems = await this.prisma.test_question_answer_items.findMany();
 
     return {
-      title: testItem.title,
+      title: publishedTestItem.title,
       questions: questions.map(f => {
         return {
           id: f.id,
           title: f.questionTitle,
           type: f.questionType,
-          items: items.filter(x => x.parentTestQuestionId == f.id).map(f => {
+          items: answerItems.filter(x => x.parentTestQuestionId == f.id).map(f => {
             return {
               label: f.label,
               value: f.value,

@@ -21,11 +21,17 @@ export class PublishedTestController extends BaseController {
 
   @Get('/list')
   async getList(/*@CurrentMember() currentMember*/) {
-    return await this.prisma.$queryRawUnsafe(`
-        select pt.id, t.title, pt.isRandom, pt.isActive
+    const items: any[] = await this.prisma.$queryRawUnsafe(`
+        select pt.id,
+               pt.title,
+               pt.isActive,
+               (select count(*) from answered_test_items ati where ati.parentAnswerItemId = pt.id) questionBankCount
         from published_tests pt
-                 inner join tests t on pt.testTemplateId = t.id
     `);
+    return items.map(f => {
+      f.questionBankCount = Number(f.questionBankCount);
+      return f;
+    });
   }
 
   @Post()
@@ -53,7 +59,7 @@ export class PublishedTestController extends BaseController {
           parentPublishedTestId: id,
           testTemplateId: f.testId,
           isRandom: f.isRandom,
-          questionRandomNumbers: f.randomCountNumbers,
+          questionRandomNumbers: Number(f.randomCount),
         };
       }),
     }));
@@ -66,7 +72,7 @@ export class PublishedTestController extends BaseController {
         id,
       },
     });
-    
+
     return {
       id: item.id,
       title: item.title,

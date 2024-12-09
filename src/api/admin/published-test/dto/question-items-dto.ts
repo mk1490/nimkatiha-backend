@@ -10,7 +10,7 @@ export class QuestionItemsDto {
 
 
   @ApiProperty()
-  randomCountNumbers: number;
+  randomCount: number;
 
 
 }
