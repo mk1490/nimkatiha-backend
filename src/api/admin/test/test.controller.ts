@@ -42,14 +42,19 @@ export class TestController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdateTestDto) {
+    const item = await this.prisma.tests.create({
+      data: {
+        title: input.title,
+        slug: input.slug,
+      },
+    });
     return {
-      ...await this.prisma.tests.create({
-        data: {
-          title: input.title,
-          slug: input.slug,
+      ...item,
+      questionsCount: await this.prisma.test_questions.count({
+        where: {
+          parentId: item.id,
         },
       }),
-      questionsCount: 0,
     };
   }
 
@@ -66,7 +71,11 @@ export class TestController extends BaseController {
           id,
         },
       }),
-      questionsCount: 0,
+      questionsCount: await this.prisma.test_questions.count({
+        where: {
+          parentId: id,
+        },
+      }),
     };
   }
 
