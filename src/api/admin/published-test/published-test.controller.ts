@@ -102,6 +102,7 @@ export class PublishedTestController extends BaseController {
     return {
       id: item.id,
       title: item.title,
+      isActive: item.isActive,
       count: await this.prisma.published_test_question_items.count({
         where: {
           parentPublishedTestId: id,
@@ -159,6 +160,7 @@ export class PublishedTestController extends BaseController {
     return {
       id: item.id,
       title: item.title,
+      isActive: item.isActive,
       count: await this.prisma.published_test_question_items.count({
         where: {
           parentPublishedTestId: id,
