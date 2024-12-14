@@ -32,7 +32,7 @@ export class TestController extends BaseController {
 
     return publishedTests.map(f => {
       const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
-      if (publishedTestItem){
+      if (publishedTestItem) {
         const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
         let status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
         return {
@@ -193,6 +193,18 @@ export class TestController extends BaseController {
       const questionId = objectKey;
 
 
+      const questionItem = questions.find(x => x.id == questionId);
+      const answerItem = testQuestionAnswerItems.find(x => x.value == answer);
+
+      let isCorrect = false;
+      let answerContent = null;
+
+      if (questionItem.questionType === 1) { // سوال انتخابی
+        isCorrect = answerItem ? answerItem.id == questionItem.correctAnswerId : false;
+        answerContent = answerItem ? answerItem.label : null;
+      } else if (questionItem.questionType === 2) { // سوال تشریحی
+        answerContent = answer;
+      }
       transactions.push(this.prisma.answered_test_items.updateMany({
         where: {
           questionId: questionId,
@@ -203,15 +215,10 @@ export class TestController extends BaseController {
         },
       }));
 
-      const questionItem = questions.find(x => x.id == questionId);
-      const answerItem = testQuestionAnswerItems.find(x => x.value == answer);
-
-
-      const isCorrect = answerItem ? answerItem.id == questionItem.correctAnswerId : false;
 
       stringifyAnswerItems.push({
         questionTitle: questionItem ? questionItem.questionTitle : '',
-        answerContent: answerItem ? answerItem.label : null,
+        answerContent: answer,
         isCorrect: isCorrect,
         score: isCorrect == true ? questionItem.questionScore : 0,
       });
