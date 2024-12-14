@@ -162,8 +162,6 @@ export class TestController extends BaseController {
   async submit(
     @CurrentMember() currentMember,
     @Body() input: TestDto) {
-
-
     const item = await this.prisma.member_answered_tests.findFirst({
       where: {
         publishedTestItemId: input.testId,
@@ -171,8 +169,8 @@ export class TestController extends BaseController {
       },
     });
 
-    if (item && item.status == TestStatuses.Success)
-      throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
+    // if (item && item.status == TestStatuses.Success)
+    //   throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
 
 
     const questions = await this.prisma.test_questions.findMany();
@@ -218,7 +216,7 @@ export class TestController extends BaseController {
 
       stringifyAnswerItems.push({
         questionTitle: questionItem ? questionItem.questionTitle : '',
-        answerContent: answer,
+        answerContent: answerContent,
         isCorrect: isCorrect,
         score: isCorrect == true ? questionItem.questionScore : 0,
       });
