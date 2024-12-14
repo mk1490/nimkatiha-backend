@@ -124,6 +124,7 @@ export class AuthController extends BaseController {
       last_name: memberItem.family,
       mobile: memberItem.mobileNumber,
       id: memberItem.id,
+      status: memberItem.status,
     });
   }
 
@@ -161,7 +162,8 @@ export class AuthController extends BaseController {
     id: string,
     mobile: string,
     last_name: string,
-    first_name: string
+    first_name: string,
+    status: number,
   }) {
     const payload = {
       username: userItem.mobile,
@@ -169,7 +171,10 @@ export class AuthController extends BaseController {
       type: 'normal',
     };
 
-    const token = this.jwtService.sign(payload, { secret: jwtConstants.privateKey });
+    const token = this.jwtService.sign(payload, {
+      secret: jwtConstants.privateKey,
+      expiresIn: '3d',
+    });
     return {
       user: userItem,
       token: token,

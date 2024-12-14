@@ -116,6 +116,8 @@ model members {
   educationalCourses                String?  @db.LongText
   creationTime                      DateTime @default(now())
   questionnaireId                   String?
+  schoolName                        String?
+  zone                              String?
   creatorId                         String?
   isDeleted                         Boolean  @default(false)
 }
