@@ -19,6 +19,8 @@ export class CoreController extends BaseController {
   }
 
 
+
+
   @Get('/initialize')
   async initialize(
     @Headers('authorization') authorization,

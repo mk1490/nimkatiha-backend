@@ -15,6 +15,12 @@ export class HelperService {
             value
         }
     }
+    getComboBox(title, value) {
+        return {
+            title,
+            value
+        }
+    }
 
     generateUuid() {
         return uuidv4();

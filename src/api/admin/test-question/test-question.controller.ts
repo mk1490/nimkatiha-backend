@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateTestQuestionDto } from './dto/create-update-test-question-dto';
 
@@ -142,6 +142,32 @@ export class TestQuestionController extends BaseController {
       this.helper.getKeyValue('چهار گزینه ای', 1),
       this.helper.getKeyValue('تشریحی', 2),
     ];
+  }
+
+
+  @Delete('/:id')
+  async delete(@Param('id') id) {
+    const item = await this.prisma.test_questions.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    const transaction = [];
+
+    transaction.push(this.prisma.test_questions.delete({
+      where: {
+        id,
+      },
+    }));
+
+    transaction.push(this.prisma.test_question_answer_items.deleteMany({
+      where: {
+        parentTestQuestionId: item.id,
+      },
+    }));
+
+    await this.prisma.$transaction(transaction);
   }
 
 

@@ -1,9 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { QuestionItemsDto } from './question-items-dto';
 
 export class CreateUpdatePublishedTestDto {
   @ApiProperty()
-  testId: string;
+  title: string;
 
   @ApiProperty()
-  isRandom: boolean;
+  description: string;
+
+  @ApiProperty()
+  endDescription: string;
+
+  @ApiProperty()
+  time: number;
+
+
+  @ApiProperty()
+  items: QuestionItemsDto[] = [];
 }

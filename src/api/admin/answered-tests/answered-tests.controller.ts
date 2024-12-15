@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 
 @Controller('answered-tests')
@@ -11,15 +11,39 @@ export class AnsweredTestsController extends BaseController {
   @Get('/list')
   async getList() {
     return await this.prisma.$queryRawUnsafe(`
-        select m.id,
+        select at.id,
+               m.id                          memberId,
+               concat(m.name, ' ', m.family) fullName,
+               m.schoolName,
+               m.educationLevel,
+               c.title                       city,
+               m.zone,
                m.mobileNumber,
-               t.title testTitle,
+               pt.title                      testTitle,
                at.creationTime
-        from answered_tests at
+        from member_answered_tests at
          inner join members m
         on m.id = at.userId
-            inner join tests t on t.id = at.testId
+            inner join published_tests pt on pt.id = at.publishedTestItemId
+            left join cities c on c.cityId = m.city
     `);
+  }
+
+
+  @Get('/:id')
+  async getDetails(
+    @Param('id') id) {
+    const item = await this.prisma.member_answered_tests.findFirst({
+      where: {
+        id,
+      },
+    });
+
+
+    return {
+      ...JSON.parse(item.stringifyData),
+    };
+
   }
 
 }

@@ -167,30 +167,24 @@ export class TestTemplateController extends BaseController {
   }
 
 
-  @Delete('/test-template/:id')
+  @Delete('/:id')
   async deleteTestTemplate(@Param('id') id) {
 
     const transactions = [];
 
 
-    transactions.push(this.prisma.form_template_items.delete({
+    const item = await this.prisma.form_templates.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    transactions.push(this.prisma.test_templates.delete({
       where: {
         id,
       },
     }));
 
-
-    transactions.push(this.prisma.test_template_levels.deleteMany({
-      where: {
-        formId: id,
-      },
-    }));
-
-    transactions.push(this.prisma.form_template_items.deleteMany({
-      where: {
-        parentId: id,
-      },
-    }));
 
     await this.prisma.$transaction(transactions);
   }

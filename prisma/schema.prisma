@@ -9,8 +9,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  // url      = env("DATABASE_URL")
-  url      = "mysql://root:@localhost:3306/nimkatiha?connection_limit=5&socket_timeout=3"
+  url      = env("DATABASE_URL")
 }
 
 model users {
@@ -117,6 +116,8 @@ model members {
   educationalCourses                String?  @db.LongText
   creationTime                      DateTime @default(now())
   questionnaireId                   String?
+  schoolName                        String?
+  zone                              String?
   creatorId                         String?
   isDeleted                         Boolean  @default(false)
 }
@@ -278,7 +279,6 @@ model tests {
   id           String   @id() @default(uuid())
   title        String
   slug         String?
-  time         Int
   creationTime DateTime @default(now())
 }
 
@@ -302,19 +302,31 @@ model test_question_answer_items {
 
 model published_tests {
   id             String   @id() @default(uuid())
-  testTemplateId String
-  isRandom       Boolean
+  title          String?
+  description    String?
+  endDescription String?
+  time           Int?
+  isActive       Boolean  @default(true)
   creationTime   DateTime @default(now())
 }
 
-model answered_tests {
-  id            String   @id() @default(uuid())
-  status        Int
-  testId        String
-  userId        String
-  endTime       DateTime
-  stringifyData String?
-  creationTime  DateTime @default(now())
+model published_test_question_items {
+  id                    String   @id() @default(uuid())
+  testTemplateId        String
+  isRandom              Boolean
+  questionRandomNumbers Int?
+  parentPublishedTestId String
+  creationTime          DateTime @default(now())
+}
+
+model member_answered_tests {
+  id                  String   @id() @default(uuid())
+  status              Int
+  publishedTestItemId String
+  userId              String
+  endTime             DateTime
+  stringifyData       String?  @db.LongText
+  creationTime        DateTime @default(now())
 }
 
 model answered_test_items {
@@ -323,4 +335,12 @@ model answered_test_items {
   answerContent      String?
   parentAnswerItemId String?
   creationTime       DateTime @default(now())
+}
+
+model questionnaire_members {
+  id              String   @id() @default(uuid())
+  questionnaireId String
+  memberId        String
+  status          Int
+  creationTime    DateTime @default(now())
 }

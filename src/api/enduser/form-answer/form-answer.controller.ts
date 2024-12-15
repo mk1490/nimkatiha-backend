@@ -20,11 +20,13 @@ export class FormAnswerController extends BaseController {
   ) {
     const memberId = currentMember.id;
 
+
     const testTemplateLevel = await this.prisma.test_template_levels.findFirst({
       where: {
         id: levelId,
       },
     });
+
 
     const item = await this.prisma.answer_sheets.findFirst({
       where: {
@@ -101,6 +103,24 @@ export class FormAnswerController extends BaseController {
           };
         }),
       }));
+
+
+      const levelItems = await this.prisma.test_template_levels.findMany({
+        where: {
+          parentId: testTemplateLevel.parentId,
+        },
+      });
+      if (levelId == levelItems[levelItems.length - 1].id) {
+        transaction.push(this.prisma.questionnaire_members.create({
+          data: {
+            memberId: memberId,
+            questionnaireId: levelItems[0].parentId,
+            status: 1,
+          },
+        }));
+      }
+
+
       await this.prisma.$transaction(transaction);
     }
   }
