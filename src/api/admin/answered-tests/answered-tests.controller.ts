@@ -71,11 +71,11 @@ export class AnsweredTestsController extends BaseController {
     return items.map(f => {
       const stringifyData = JSON.parse(f.stringifyData);
       let totalScore = 0;
-      f.stringifyData = stringifyData.map(f => {
+      f.stringifyData = stringifyData && stringifyData.length > 0 ? stringifyData.map(f => {
         f.id = this.helper.generateUuid();
         totalScore += f.score;
         return f;
-      });
+      }) : [];
       f.totalScore = totalScore;
       return f;
     });
