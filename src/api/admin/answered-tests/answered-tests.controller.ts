@@ -8,6 +8,20 @@ export class AnsweredTestsController extends BaseController {
     super();
   }
 
+  @Get('/initialize')
+  async initialize() {
+    const publishedTests = await this.prisma.published_tests.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: false,
+      },
+    });
+    return {
+      publishedTests,
+    };
+  }
+
   @Get('/list')
   async getList() {
     return await this.prisma.$queryRawUnsafe(`
@@ -29,8 +43,8 @@ export class AnsweredTestsController extends BaseController {
     `);
   }
 
-  @Get('/download-excel')
-  async downloadExcel() {
+  @Get('/download-excel/:testId')
+  async downloadExcel(@Param('testId') testId) {
     const items: any[] = await this.prisma.$queryRawUnsafe(`
         select at.id,
                m.id     memberId,
@@ -50,6 +64,7 @@ export class AnsweredTestsController extends BaseController {
         on m.id = at.userId
             inner join published_tests pt on pt.id = at.publishedTestItemId
             left join cities c on c.cityId = m.city
+        where at.publishedTestItemId = '${testId}'
     `);
 
 
