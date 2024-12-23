@@ -88,6 +88,20 @@ export class TestTemplateController extends BaseController {
     });
   }
 
+  @Put('/change-status/:id')
+  async changeStatus(
+    @Param('id') id,
+    @Body('status') status,
+  ) {
+    await this.prisma.test_templates.update({
+      where: {
+        id,
+      },
+      data: {
+        visible: status,
+      },
+    });
+  }
 
   @Put('/update-level-item-form/:id')
   async updateLevelItem(

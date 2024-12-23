@@ -169,7 +169,6 @@ export class PublishedTestController extends BaseController {
     };
   }
 
-
   @Put('/change-status/:id')
   async changeStatus(
     @Param('id') id,
