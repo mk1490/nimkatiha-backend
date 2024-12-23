@@ -13,7 +13,11 @@ export class QuestionnaireController extends BaseController {
 
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
-    const testQuestions = await this.prisma.test_templates.findMany();
+    const testQuestions = await this.prisma.test_templates.findMany({
+      where: {
+        visible: true,
+      },
+    });
     const questionnaireMembers = await this.prisma.questionnaire_members.findMany({
       where: {
         memberId: currentMember.id,
