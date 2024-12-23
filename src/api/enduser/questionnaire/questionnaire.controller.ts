@@ -28,7 +28,7 @@ export class QuestionnaireController extends BaseController {
       return {
         title: f.title,
         slug: f.slug,
-        status: !!questionnaireMembers.find(x => x.questionnaireId == f.id),
+        status: !!questionnaireMembers. find(x => x.questionnaireId == f.id),
       };
     });
   }
