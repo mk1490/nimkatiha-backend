@@ -198,7 +198,7 @@ export class TestController extends BaseController {
       let answerContent = null;
 
       if (questionItem.questionType === 1) { // سوال انتخابی
-        isCorrect = answerItem ? answerItem.id == questionItem.correctAnswerId : false;
+        isCorrect = answerItem ? answerItem.value == questionItem.correctAnswerId : false;
         answerContent = answerItem ? answerItem.label : null;
       } else if (questionItem.questionType === 2) { // سوال تشریحی
         answerContent = answer;
