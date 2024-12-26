@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 
 @Controller('answered-tests')
@@ -23,8 +23,8 @@ export class AnsweredTestsController extends BaseController {
   }
 
   @Get('/list')
-  async getList() {
-    return await this.prisma.$queryRawUnsafe(`
+  async getList(@Query('id') id) {
+    const items = await this.prisma.$queryRawUnsafe(`
         select at.id,
                m.id                          memberId,
                concat(m.name, ' ', m.family) fullName,
@@ -40,7 +40,18 @@ export class AnsweredTestsController extends BaseController {
         on m.id = at.userId
             inner join published_tests pt on pt.id = at.publishedTestItemId
             left join cities c on c.cityId = m.city
+        ${id? `where pt.id = '${id}'`: ''}
     `);
+    const tests = await this.prisma.published_tests.findMany();
+
+    return {
+      list: items,
+      initialize: {
+        tests: tests.map(f => {
+          return this.helper.getKeyValue(f.title, f.id);
+        }),
+      },
+    };
   }
 
   @Get('/download-excel/:testId')
