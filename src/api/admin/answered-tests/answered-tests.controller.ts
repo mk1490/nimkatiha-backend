@@ -40,7 +40,7 @@ export class AnsweredTestsController extends BaseController {
         on m.id = at.userId
             inner join published_tests pt on pt.id = at.publishedTestItemId
             left join cities c on c.cityId = m.city
-        ${id? `where pt.id = '${id}'`: ''}
+            ${id ? `where pt.id = '${id}'` : ''}
     `);
     const tests = await this.prisma.published_tests.findMany();
 
@@ -78,18 +78,63 @@ export class AnsweredTestsController extends BaseController {
         where at.publishedTestItemId = '${testId}'
     `);
 
+    const final = [];
 
-    return items.map(f => {
-      const stringifyData = JSON.parse(f.stringifyData);
-      let totalScore = 0;
-      f.stringifyData = stringifyData && stringifyData.length > 0 ? stringifyData.map(f => {
-        f.id = this.helper.generateUuid();
-        totalScore += f.score;
-        return f;
-      }) : [];
-      f.totalScore = totalScore;
-      return f;
-    });
+
+    for (let i = 0; i < items.length; i++) {
+
+      const f = items[i];
+      let score = 0;
+
+      const answered_test_items = await this.prisma.answered_test_items.findMany({
+        where: {
+          parentAnswerItemId: f.id,
+        },
+      });
+
+      let stringifyData = [];
+      await Promise.all(answered_test_items.map(async (answerTestItem) => {
+        const questionItem = await this.prisma.test_questions.findFirst({
+          where: {
+            id: answerTestItem.questionId,
+          },
+        });
+
+
+        if (answerTestItem.answerContent == questionItem.correctAnswerId) {
+          score += questionItem.questionScore;
+        }
+
+        let answerItem;
+        if (answerTestItem.answerContent) {
+          answerItem = await this.prisma.test_question_answer_items.findFirst({
+            where: {
+              OR: [
+                { id: answerTestItem.answerContent },
+                { value: answerTestItem.answerContent },
+              ],
+            },
+          });
+        }
+
+        stringifyData.push({
+          id: this.helper.generateUuid(),
+          questionTitle: questionItem.questionTitle,
+          answerContent: answerItem ? answerItem.label : null,
+
+        });
+        f.stringifyData = stringifyData;
+
+      }));
+
+      final.push({
+        ...f,
+        totalScore: score,
+      });
+
+    }
+
+    return final;
   }
 
 
