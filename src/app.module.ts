@@ -18,6 +18,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { AccessPermissionService } from './service/access-permission/access-permission.service';
 import { NotificationService } from './service/notification/notification.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -43,6 +44,9 @@ import { NotificationService } from './service/notification/notification.service
       serveRoot: '/api/public-files',
       rootPath: join(homedir(), '/dastafarinan/public'),
       exclude: ['/api*'],
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
   controllers: [
