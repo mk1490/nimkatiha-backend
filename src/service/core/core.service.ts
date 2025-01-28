@@ -5,6 +5,36 @@ import { BaseService } from '../../base/base-service';
 export class CoreService extends BaseService {
 
 
+  async initializeAuth(){
+    const cities = await this.prisma.cities.findMany();
+    return {
+      cities: cities.map(f => {
+        return this.helper.getComboBox(f.title, f.cityId);
+      }),
+      educationLevels: [
+        this.helper.getComboBox('هفتم', 7),
+        this.helper.getComboBox('هشتم', 8),
+        this.helper.getComboBox('نهم', 9),
+        this.helper.getComboBox('دهم', 10),
+        this.helper.getComboBox('یازدهم', 11),
+        this.helper.getComboBox('دوازدهم', 12),
+      ],
+      zones: [
+        this.helper.getComboBox('ناحیه 1', 1),
+        this.helper.getComboBox('ناحیه 2', 2),
+        this.helper.getComboBox('ناحیه 3', 3),
+        this.helper.getComboBox('ناحیه 4', 4),
+        this.helper.getComboBox('ناحیه 5', 5),
+        this.helper.getComboBox('ناحیه 6', 6),
+        this.helper.getComboBox('ناحیه 7', 7),
+        this.helper.getComboBox('تبادکان', 8),
+        this.helper.getComboBox('رضویه', 8),
+        this.helper.getComboBox('احمدآباد', 9),
+      ],
+    };
+  }
+
+
   async findCity(cityTitle) {
     if (cityTitle.length < 3)
       return [];

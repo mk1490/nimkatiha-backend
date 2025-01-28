@@ -20,6 +20,7 @@ import { WorkflowActions } from '../../../enums/workflowActions';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constants';
 import { UpdateProfileDto } from './dto/update-profile-dto';
+import { CoreService } from '../../../service/core/core.service';
 
 @ApiTags('Auth (enduser)')
 @Controller('auth')
@@ -30,6 +31,7 @@ export class AuthController extends BaseController {
     private readonly smsService: SmsService,
     private readonly jwtService: JwtService,
     private readonly workflowService: WorkflowService,
+    private readonly coreService: CoreService,
   ) {
     super();
   }
@@ -37,34 +39,7 @@ export class AuthController extends BaseController {
 
   @Get('/initialize')
   async initialize() {
-    const cities = await this.prisma.cities.findMany();
-
-
-    return {
-      cities: cities.map(f => {
-        return this.helper.getComboBox(f.title, f.cityId);
-      }),
-      educationLevels: [
-        this.helper.getComboBox('هفتم', 7),
-        this.helper.getComboBox('هشتم', 8),
-        this.helper.getComboBox('نهم', 9),
-        this.helper.getComboBox('دهم', 10),
-        this.helper.getComboBox('یازدهم', 11),
-        this.helper.getComboBox('دوازدهم', 12),
-      ],
-      zones: [
-        this.helper.getComboBox('ناحیه 1', 1),
-        this.helper.getComboBox('ناحیه 2', 2),
-        this.helper.getComboBox('ناحیه 3', 3),
-        this.helper.getComboBox('ناحیه 4', 4),
-        this.helper.getComboBox('ناحیه 5', 5),
-        this.helper.getComboBox('ناحیه 6', 6),
-        this.helper.getComboBox('ناحیه 7', 7),
-        this.helper.getComboBox('تبادکان', 8),
-        this.helper.getComboBox('رضویه', 8),
-        this.helper.getComboBox('احمدآباد', 9),
-      ],
-    };
+    return await this.coreService.initializeAuth()
   }
 
 
@@ -115,24 +90,85 @@ export class AuthController extends BaseController {
     @Headers('authorization') authorization,
     @Body() input: UpdateProfileDto) {
 
-    const jwtUser = await this.jwtService.verifyAsync(authorization.replaceAll('Bearer ', ''), {
-      secret: jwtConstants.privateKey,
-    });
-    await this.prisma.members.update({
-      where: {
-        id: jwtUser.sub,
-      },
-      data: {
-        name: input.name,
-        family: input.family,
-        city: String(input.city),
-        nationalCode: input.nationalCode,
-        schoolName: input.schoolName,
-        fatherName: input.fatherName,
-        educationLevel: Number(input.educationLevel),
-        zone: String(input.zone),
-        status: 1,
-      },
-    });
+    if (input.mobileNumber){
+
+      let userItem = await this.prisma.members.findFirst({
+        where:{
+          mobileNumber: input.mobileNumber,
+        }
+      })
+
+      if (!userItem){
+       userItem = await this.prisma.members.create({
+        data:{
+          name: input.name,
+          family: input.family,
+          city: String(input.city),
+          nationalCode: input.nationalCode,
+          mobileNumber: input.mobileNumber,
+          schoolName: input.schoolName,
+          fatherName: input.fatherName,
+          educationLevel: Number(input.educationLevel),
+          zone: String(input.zone),
+          status: 1,
+        }
+      })
+      }else {
+        userItem = await this.prisma.members.update({
+          where: {
+            id: userItem.id,
+          },
+          data: {
+            name: input.name,
+            family: input.family,
+            city: String(input.city),
+            nationalCode: input.nationalCode,
+            schoolName: input.schoolName,
+            fatherName: input.fatherName,
+            educationLevel: Number(input.educationLevel),
+            zone: String(input.zone),
+            status: 1,
+          },
+        });
+      }
+
+
+      return {
+        access_token: this.jwtService.sign({
+          username: userItem.username,
+          sub: userItem.id,
+          type: 'normal',
+        }, {
+          secret: jwtConstants.privateKey,
+          expiresIn: '24h',
+        }),
+
+      };
+
+    }else {
+
+      const jwtUser = await this.jwtService.verifyAsync(authorization.replaceAll('Bearer ', ''), {
+        secret: jwtConstants.privateKey,
+      });
+
+      await this.prisma.members.update({
+        where: {
+          id: jwtUser.sub,
+        },
+        data: {
+          name: input.name,
+          family: input.family,
+          city: String(input.city),
+          nationalCode: input.nationalCode,
+          schoolName: input.schoolName,
+          fatherName: input.fatherName,
+          educationLevel: Number(input.educationLevel),
+          zone: String(input.zone),
+          status: 1,
+        },
+      });
+    }
+
+
   }
 }

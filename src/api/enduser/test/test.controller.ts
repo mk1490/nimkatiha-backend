@@ -1,14 +1,20 @@
-import { Body, Controller, Get, NotAcceptableException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, NotAcceptableException, Param, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { TestDto } from './dto/test-dto';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 import * as test from 'node:test';
 import { TestStatuses } from '../../../base/enums/TestStatuses';
+import { jwtConstants } from '../../auth/constants';
+import { JwtService } from '@nestjs/jwt';
+import { CoreService } from '../../../service/core/core.service';
 
 @Controller('test')
 export class TestController extends BaseController {
 
-  constructor() {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly coreService: CoreService,
+  ) {
     super();
   }
 
@@ -46,15 +52,22 @@ export class TestController extends BaseController {
   }
 
 
-  @Get('/initialize/:publishedTestId')
+  @Post('/initialize/:publishedTestIdOrSlug')
   async initialize(
-    @CurrentMember() currentMember,
-    @Param('publishedTestId') publishedTestId) {
+    @Headers('authorization') authorization,
+    @Param('publishedTestIdOrSlug') publishedTestIdOrSlug) {
 
 
     const publishedTestItem = await this.prisma.published_tests.findFirst({
       where: {
-        id: publishedTestId,
+        OR: [
+          {
+            id: publishedTestIdOrSlug,
+          },
+          {
+            slug: publishedTestIdOrSlug,
+          },
+        ],
       },
     });
 
@@ -63,11 +76,29 @@ export class TestController extends BaseController {
       throw new NotAcceptableException('لینک آژمون درخواستی معتبر نیست');
 
 
+    let memberId = null;
+
+    let wherePayload: any = {
+      publishedTestItemId: publishedTestItem.id,
+    };
+    if (publishedTestItem.authenticationRequired == true) {
+
+      wherePayload.userId = memberId;
+    } else {
+      const jwtPayload = await this.jwtService.verifyAsync(authorization.replace('Bearer ', ''), {
+        secret: jwtConstants.privateKey,
+      });
+      const memberItem = await this.prisma.members.findFirst({
+        where:{
+          id: jwtPayload.sub
+        }
+      });
+      memberId = memberItem.id;
+    }
+
+
     const answerTestItem = await this.prisma.member_answered_tests.findFirst({
-      where: {
-        userId: currentMember.id,
-        publishedTestItemId: publishedTestItem.id,
-      },
+      where: wherePayload,
     });
     if (answerTestItem && answerTestItem.endTime < new Date())
       throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
@@ -93,7 +124,7 @@ export class TestController extends BaseController {
       const testItem = testItems.find(x => x.id == f.testTemplateId);
       let tempQuestions = await this.prisma.test_questions.findMany({
         where: {
-          parentId: testItem.id,
+          parentId: publishedTestItem.id,
         },
       });
 
@@ -111,27 +142,28 @@ export class TestController extends BaseController {
     const endTime = new Date();
     endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
 
-    transactions.push(this.prisma.member_answered_tests.create({
-      data: {
-        id,
-        publishedTestItemId: publishedTestItem.id,
-        status: TestStatuses.Incomplete,
-        endTime: endTime,
-        userId: currentMember.id,
-      },
-    }));
+    if (memberId){
+      transactions.push(this.prisma.member_answered_tests.create({
+        data: {
+          id,
+          publishedTestItemId: publishedTestItem.id,
+          status: TestStatuses.Incomplete,
+          endTime: endTime,
+          userId: memberId,
+        },
+      }));
 
 
-    transactions.push(this.prisma.answered_test_items.createMany({
-      data: questions.map(questionItem => {
-        return {
-          questionId: questionItem.id,
-          answerContent: null,
-          parentAnswerItemId: id,
-        };
-      }),
-    }));
-
+      transactions.push(this.prisma.answered_test_items.createMany({
+        data: questions.map(questionItem => {
+          return {
+            questionId: questionItem.id,
+            answerContent: null,
+            parentAnswerItemId: id,
+          };
+        }),
+      }));
+    }
 
     await this.prisma.$transaction(transactions);
 
@@ -141,6 +173,9 @@ export class TestController extends BaseController {
     return {
       title: publishedTestItem.title,
       endDescription: publishedTestItem.endDescription,
+      authenticationRequired: publishedTestItem.authenticationRequired,
+      memberId,
+      initialize: await this.coreService.initializeAuth(),
       questions: questions.map(f => {
         return {
           id: f.id,

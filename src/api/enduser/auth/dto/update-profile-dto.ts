@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateProfileDto {
   @ApiProperty()
   name: string;
+
   @ApiProperty()
   family: string;
 
@@ -24,4 +25,7 @@ export class UpdateProfileDto {
 
   @ApiProperty()
   zone: string;
+
+  @ApiProperty()
+  mobileNumber: string;
 }
