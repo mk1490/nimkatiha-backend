@@ -85,7 +85,7 @@ export class PublishedTestController extends BaseController {
         authenticationRequired: input.authenticationRequired,
         time: Number(input.time),
         slug: input.slug,
-        educationalConditions: input.educationalConditions.length > 0 ? input.educationalConditions.toString() : null,
+        educationalConditions: input.educationalConditions && input.educationalConditions.length > 0 ? input.educationalConditions.toString() : null,
         isActive: true,
       },
     }));
