@@ -87,19 +87,19 @@ export class TestController extends BaseController {
       const questionScore = Number(item[getKeyByValue(items[0], 'نمره')]) || 0;
       let correctAnswer = item[getKeyByValue(items[0], 'گزینه صحیح')] || null;
       const questionOne = {
-        label: item[getKeyByValue(items[0], 'الف')] || null,
+        label: item[getKeyByValue(items[0], 'الف')].toString() || null,
         id: this.helper.generateUuid(),
       };
       const questionTwo = {
-        label: item[getKeyByValue(items[0], 'ب')] || null,
+        label: item[getKeyByValue(items[0], 'ب')].toString() || null,
         id: this.helper.generateUuid(),
       };
       const questionThree = {
-        label: item[getKeyByValue(items[0], 'ج')] || null,
+        label: item[getKeyByValue(items[0], 'ج')].toString() || null,
         id: this.helper.generateUuid(),
       };
       const questionFour = {
-        label: item[getKeyByValue(items[0], 'د')] || null,
+        label: item[getKeyByValue(items[0], 'د')].toString() || null,
         id: this.helper.generateUuid(),
       };
 
