@@ -16,6 +16,14 @@ export class PublishedTestController extends BaseController {
       tests: items.map(f => {
         return this.helper.getKeyValue(f.title, f.id);
       }),
+      educationGrade: [
+        this.helper.getKeyValue('پایه هفتم', 7),
+        this.helper.getKeyValue('پایه هشتم', 8),
+        this.helper.getKeyValue('پایه نهم', 9),
+        this.helper.getKeyValue('پایه دهم', 10),
+        this.helper.getKeyValue('پایه یازدهم', 11),
+        this.helper.getKeyValue('پایه دوازدهم', 12),
+      ]
     };
   }
 
@@ -73,7 +81,10 @@ export class PublishedTestController extends BaseController {
         title: input.title,
         description: input.description,
         endDescription: input.endDescription,
+        authenticationRequired: input.authenticationRequired,
         time: Number(input.time),
+        slug: input.slug,
+        educationalConditions: input.educationalConditions.length > 0 ?input.educationalConditions.toString() : null,
         isActive: true,
       },
     }));

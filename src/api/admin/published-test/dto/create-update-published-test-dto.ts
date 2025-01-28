@@ -14,6 +14,14 @@ export class CreateUpdatePublishedTestDto {
   @ApiProperty()
   time: number;
 
+  @ApiProperty()
+  authenticationRequired: boolean;
+
+  @ApiProperty()
+  slug?: string;
+
+  @ApiProperty()
+  educationalConditions: string[];
 
   @ApiProperty()
   items: QuestionItemsDto[] = [];
