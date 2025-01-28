@@ -23,7 +23,7 @@ export class PublishedTestController extends BaseController {
         this.helper.getKeyValue('پایه دهم', 10),
         this.helper.getKeyValue('پایه یازدهم', 11),
         this.helper.getKeyValue('پایه دوازدهم', 12),
-      ]
+      ],
     };
   }
 
@@ -70,9 +70,10 @@ export class PublishedTestController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdatePublishedTestDto) {
+
+    await this.checkSlug(input.slug);
+
     const transactions = [];
-
-
     const id = this.helper.generateUuid();
 
     transactions.push(this.prisma.published_tests.create({
@@ -84,7 +85,7 @@ export class PublishedTestController extends BaseController {
         authenticationRequired: input.authenticationRequired,
         time: Number(input.time),
         slug: input.slug,
-        educationalConditions: input.educationalConditions.length > 0 ?input.educationalConditions.toString() : null,
+        educationalConditions: input.educationalConditions.length > 0 ? input.educationalConditions.toString() : null,
         isActive: true,
       },
     }));
@@ -127,6 +128,17 @@ export class PublishedTestController extends BaseController {
   async update(
     @Param('id') id,
     @Body() input: CreateUpdatePublishedTestDto) {
+
+    const itemExists = await this.prisma.published_tests.findFirst({
+      where:{
+        id,
+      }
+    })
+
+    if (itemExists.slug != input.slug){
+      await this.checkSlug(input.slug);
+    }
+
     const transactions = [];
 
     transactions.push(this.prisma.published_tests.update({
@@ -138,15 +150,18 @@ export class PublishedTestController extends BaseController {
         description: input.description,
         endDescription: input.endDescription,
         time: Number(input.time),
+        authenticationRequired: input.authenticationRequired,
+        slug: input.slug,
+        educationalConditions: input.educationalConditions.length > 0 ? input.educationalConditions.toString() : null,
         isActive: true,
       },
     }));
 
     transactions.push(this.prisma.published_test_question_items.deleteMany({
-      where:{
+      where: {
         parentPublishedTestId: id,
-      }
-    }))
+      },
+    }));
 
     transactions.push(this.prisma.published_test_question_items.createMany({
       data: input.items.map(f => {
@@ -208,4 +223,14 @@ export class PublishedTestController extends BaseController {
     });
   }
 
+  private async checkSlug(slug: string) {
+    const exists = await this.prisma.published_tests.findFirst({
+      where: {
+        slug,
+      },
+    });
+    if (exists) {
+      throw new NotAcceptableException('اسلاگ وارد شده از قبل وجود دارد.');
+    }
+  }
 }
