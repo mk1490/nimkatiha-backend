@@ -7,6 +7,7 @@ import { TestStatuses } from '../../../base/enums/TestStatuses';
 import { jwtConstants } from '../../auth/constants';
 import { JwtService } from '@nestjs/jwt';
 import { CoreService } from '../../../service/core/core.service';
+import to from 'await-to-js';
 
 @Controller('test')
 export class TestController extends BaseController {
@@ -85,15 +86,18 @@ export class TestController extends BaseController {
 
       wherePayload.userId = memberId;
     } else {
-      const jwtPayload = await this.jwtService.verifyAsync(authorization.replace('Bearer ', ''), {
+      const [err, payload] = await to(this.jwtService.verifyAsync(authorization.replace('Bearer ', ''), {
         secret: jwtConstants.privateKey,
-      });
-      const memberItem = await this.prisma.members.findFirst({
-        where:{
-          id: jwtPayload.sub
-        }
-      });
-      memberId = memberItem.id;
+      }));
+      if (!err) {
+        const memberItem = await this.prisma.members.findFirst({
+          where: {
+            id: payload.sub,
+          },
+        });
+        memberId = memberItem.id;
+      }
+
     }
 
 
@@ -142,7 +146,7 @@ export class TestController extends BaseController {
     const endTime = new Date();
     endTime.setMinutes(endTime.getMinutes() + publishedTestItem.time);
 
-    if (memberId){
+    if (memberId) {
       transactions.push(this.prisma.member_answered_tests.create({
         data: {
           id,
