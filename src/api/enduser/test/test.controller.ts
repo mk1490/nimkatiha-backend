@@ -8,6 +8,7 @@ import { jwtConstants } from '../../auth/constants';
 import { JwtService } from '@nestjs/jwt';
 import { CoreService } from '../../../service/core/core.service';
 import to from 'await-to-js';
+import { publish } from 'rxjs';
 
 @Controller('test')
 export class TestController extends BaseController {
@@ -23,11 +24,26 @@ export class TestController extends BaseController {
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
     const items = await this.prisma.tests.findMany();
-    const publishedTests = await this.prisma.published_tests.findMany({
+    let _publishedTests = await this.prisma.published_tests.findMany({
       where: {
         isActive: true,
       },
     });
+    const finalPublishedTests = [];
+
+
+    _publishedTests.map(f => {
+      if (f.educationalConditions) {
+        const educationGrades = f.educationalConditions.split(',').map(f => Number(f));
+        if (educationGrades.includes(currentMember.educationLevel)) {
+          finalPublishedTests.push(f);
+        }
+      } else {
+        finalPublishedTests.push(f);
+      }
+
+    });
+
     const answeredTests = await this.prisma.member_answered_tests.findMany({
       where: {
         userId: currentMember.id,
@@ -37,18 +53,21 @@ export class TestController extends BaseController {
 
     const publishedTestItems = await this.prisma.published_test_question_items.findMany();
 
-    return publishedTests.map(f => {
+    return finalPublishedTests.map(f => {
       const publishedTestItem = publishedTestItems.find(x => x.parentPublishedTestId == f.id);
+      // if (publishedTestItem) {
+      let status = false;
       if (publishedTestItem) {
         const testItem = items.find(x => x.id == publishedTestItem.testTemplateId);
-        let status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
-        return {
-          id: f.id,
-          title: f.title,
-          description: f.description,
-          status: status ? 1 : 0,
-        };
+        status = !!answeredTests.find(x => x.publishedTestItemId == testItem.id && x.status == TestStatuses.Success);
       }
+
+      return {
+        id: f.id,
+        title: f.title,
+        description: f.description,
+        status: status ? 1 : 0,
+      };
     });
   }
 
