@@ -21,6 +21,8 @@ export class TestController extends BaseController {
   }
 
 
+
+
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
     if (!currentMember)
@@ -71,6 +73,33 @@ export class TestController extends BaseController {
         status: status ? 1 : 0,
       };
     });
+  }
+
+
+  @Get('/status/:slugOrId')
+  async getTestStatus(
+    @CurrentMember() currentMember,
+    @Param('slugOrId') slugOrId){
+
+    const publishedTestItem = await this.prisma.published_tests.findFirst({
+      where:{
+        OR: [
+          {id: slugOrId},
+          {slug: slugOrId},
+        ]
+      }
+    })
+
+    const answerTestItem = await this.prisma.member_answered_tests.findFirst({
+      where: {
+        publishedTestItemId: publishedTestItem.id,
+        userId: currentMember.id,
+      },
+    });
+    if (answerTestItem && answerTestItem.endTime < new Date())
+      throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
+    else if (answerTestItem && answerTestItem.status === TestStatuses.Success)
+      throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
   }
 
 
