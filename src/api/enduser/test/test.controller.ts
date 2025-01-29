@@ -83,12 +83,12 @@ export class TestController extends BaseController {
       publishedTestItemId: publishedTestItem.id,
     };
     if (publishedTestItem.authenticationRequired == true) {
-
       wherePayload.userId = memberId;
     } else {
       const [err, payload] = await to(this.jwtService.verifyAsync(authorization.replace('Bearer ', ''), {
         secret: jwtConstants.privateKey,
       }));
+
       if (!err) {
         const memberItem = await this.prisma.members.findFirst({
           where: {
@@ -96,19 +96,21 @@ export class TestController extends BaseController {
           },
         });
         memberId = memberItem.id;
+        wherePayload.userId = memberId;
       }
 
     }
 
 
-    const answerTestItem = await this.prisma.member_answered_tests.findFirst({
-      where: wherePayload,
-    });
-    if (answerTestItem && answerTestItem.endTime < new Date())
-      throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
-    else if (answerTestItem && answerTestItem.status === TestStatuses.Success)
-      throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
-
+    if (wherePayload.userId) {
+      const answerTestItem = await this.prisma.member_answered_tests.findFirst({
+        where: wherePayload,
+      });
+      if (answerTestItem && answerTestItem.endTime < new Date())
+        throw new NotAcceptableException('زمان آزمون به پایان رسیده است!');
+      else if (answerTestItem && answerTestItem.status === TestStatuses.Success)
+        throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
+    }
 
     const transactions = [];
 
@@ -128,7 +130,7 @@ export class TestController extends BaseController {
       const testItem = testItems.find(x => x.id == f.testTemplateId);
       let tempQuestions = await this.prisma.test_questions.findMany({
         where: {
-          parentId: publishedTestItem.id,
+          parentId: testItem.id,
         },
       });
 
@@ -208,8 +210,8 @@ export class TestController extends BaseController {
       },
     });
 
-    // if (item && item.status == TestStatuses.Success)
-    //   throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
+    if (item && item.status == TestStatuses.Success)
+      throw new NotAcceptableException('قبلا در این آزمون شرکت کرده‌اید.');
 
 
     const questions = await this.prisma.test_questions.findMany();

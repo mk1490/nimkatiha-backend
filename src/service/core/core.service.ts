@@ -12,11 +12,11 @@ export class CoreService extends BaseService {
         return this.helper.getComboBox(f.title, f.cityId);
       }),
       educationLevels: [
-        this.helper.getComboBox('هفتم', 7),
-        this.helper.getComboBox('هشتم', 8),
+        // this.helper.getComboBox('هفتم', 7),
+        // this.helper.getComboBox('هشتم', 8),
         this.helper.getComboBox('نهم', 9),
         this.helper.getComboBox('دهم', 10),
-        this.helper.getComboBox('یازدهم', 11),
+        // this.helper.getComboBox('یازدهم', 11),
         this.helper.getComboBox('دوازدهم', 12),
       ],
       zones: [
