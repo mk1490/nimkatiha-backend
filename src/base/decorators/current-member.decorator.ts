@@ -1,4 +1,4 @@
-import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, SetMetadata, UnauthorizedException } from '@nestjs/common';
 import { AppModule } from '../../app.module';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../../api/auth/constants';
@@ -6,6 +6,7 @@ import { PrismaService } from '../../prisma.service';
 import { CurrentUserModel } from '../interfaces/current-user.interface';
 import { UsersService } from '../../service/users/users.service';
 import { AccessPermissionService } from '../../service/access-permission/access-permission.service';
+import to from 'await-to-js';
 
 export const CurrentMember = createParamDecorator(async (name: string, ctx: ExecutionContext): Promise<any> => {
   const prismaService = await AppModule.moduleRef.get(PrismaService);
@@ -14,17 +15,20 @@ export const CurrentMember = createParamDecorator(async (name: string, ctx: Exec
   const { headers } = req;
   const token = headers.authorization;
   if (!!token) {
-    const jwtUser = await jwtService.verifyAsync(token.replace('Bearer ', ''), {
+    const [err, payload] = await to(jwtService.verifyAsync(token.replace('Bearer ', ''), {
       secret: jwtConstants.privateKey,
-    });
-    const memberItem = await prismaService.members.findFirst({
-      where: {
-        id: jwtUser.sub,
-      },
-    });
-    if (!memberItem)
+    }));
+    if (!err) {
+      const memberItem = await prismaService.members.findFirst({
+        where: {
+          id: payload.sub,
+        },
+      });
+      if (!memberItem)
+        return null;
+      return memberItem;
+    } else
       return null;
-    return memberItem;
   } else {
     return null;
   }

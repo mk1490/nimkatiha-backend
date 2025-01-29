@@ -23,6 +23,8 @@ export class TestController extends BaseController {
 
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
+    if (!currentMember)
+      return { isAuth: false };
     const items = await this.prisma.tests.findMany();
     let _publishedTests = await this.prisma.published_tests.findMany({
       where: {
