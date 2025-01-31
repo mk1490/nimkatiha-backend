@@ -5,20 +5,33 @@ import { BaseService } from '../../base/base-service';
 export class CoreService extends BaseService {
 
 
-  async initializeAuth(){
+  async initializeAuth(returnAllGrades: boolean = false) {
     const cities = await this.prisma.cities.findMany();
+    let grades = [];
+
+
+    if (returnAllGrades) {
+      grades = [
+        this.helper.getComboBox('هفتم', 7),
+        this.helper.getComboBox('هشتم', 8),
+        this.helper.getComboBox('نهم', 9),
+        this.helper.getComboBox('دهم', 10),
+        this.helper.getComboBox('یازدهم', 11),
+        this.helper.getComboBox('دوازدهم', 12),
+      ];
+    } else {
+      grades = [
+        this.helper.getComboBox('نهم', 9),
+        this.helper.getComboBox('دهم', 10),
+        this.helper.getComboBox('دوازدهم', 12),
+      ];
+    }
+
     return {
       cities: cities.map(f => {
         return this.helper.getComboBox(f.title, f.cityId);
       }),
-      educationLevels: [
-        // this.helper.getComboBox('هفتم', 7),
-        // this.helper.getComboBox('هشتم', 8),
-        this.helper.getComboBox('نهم', 9),
-        this.helper.getComboBox('دهم', 10),
-        // this.helper.getComboBox('یازدهم', 11),
-        this.helper.getComboBox('دوازدهم', 12),
-      ],
+      educationLevels: grades,
       zones: [
         this.helper.getComboBox('ناحیه 1', 1),
         this.helper.getComboBox('ناحیه 2', 2),
@@ -81,7 +94,6 @@ export class CoreService extends BaseService {
       { title: 'متوسطه دوّم', value: 2 },
     ];
   }
-
 
 
   get schoolGrades() {

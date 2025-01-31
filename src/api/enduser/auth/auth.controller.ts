@@ -38,8 +38,8 @@ export class AuthController extends BaseController {
 
 
   @Get('/initialize')
-  async initialize() {
-    return await this.coreService.initializeAuth()
+  async initialize(@Query('grades') grades) {
+    return await this.coreService.initializeAuth(grades && grades == 'all')
   }
 
 
