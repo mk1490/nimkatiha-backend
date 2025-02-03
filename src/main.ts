@@ -4,6 +4,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { homedir } from 'os';
+import { MemoryLocker, Server } from '@tus/server';
+import * as express from 'express';
+import { FileStore } from '@tus/file-store';
 
 async function bootstrap() {
   const listenPort = 3000;
@@ -25,6 +28,17 @@ async function bootstrap() {
     allowedHeaders: '*',
   });
   app.useGlobalPipes(new ValidationPipe());
+
+  const server = new Server({
+    datastore: new FileStore({
+      directory: global.directories.private,
+    }),
+    path: '/uploads',
+
+  });
+  const uploadApp = express();
+  uploadApp.all('*', server.handle.bind(server));
+  app.use('/uploads', uploadApp);
   const config = new DocumentBuilder()
     .setTitle('Nimkatiha-project')
     .setDescription('The Nimkatiha project backend')

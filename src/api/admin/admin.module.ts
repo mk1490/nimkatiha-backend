@@ -22,6 +22,7 @@ import { TestController } from './test/test.controller';
 import { TestQuestionController } from './test-question/test-question.controller';
 import { PublishedTestController } from './published-test/published-test.controller';
 import { AnsweredTestsController } from './answered-tests/answered-tests.controller';
+import { FileController } from './file/file.controller';
 
 @Module({
   controllers: [
@@ -42,6 +43,7 @@ import { AnsweredTestsController } from './answered-tests/answered-tests.control
     TestQuestionController,
     PublishedTestController,
     AnsweredTestsController,
+    FileController,
   ],
   providers: [
     AccessPermissionService,

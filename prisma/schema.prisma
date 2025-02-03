@@ -348,3 +348,10 @@ model questionnaire_members {
   status          Int
   creationTime    DateTime @default(now())
 }
+
+model uploaded_files {
+  id           String   @id() @default(uuid())
+  title        String
+  fileId       String
+  creationTime DateTime @default(now())
+}
