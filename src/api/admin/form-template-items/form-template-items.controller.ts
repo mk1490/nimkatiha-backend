@@ -150,7 +150,7 @@ export class FormTemplateItemsController extends BaseController {
       FormInputTypes.SingleSelectionBox,
       FormInputTypes.MultipleSelectionBox,
       FormInputTypes.Checkbox,
-    ]) {
+    ].includes(input.type)) {
       transactions.push(this.prisma.form_template_selection_pattern_items.createMany({
         data: input.items.map((f, i) => {
           return {
