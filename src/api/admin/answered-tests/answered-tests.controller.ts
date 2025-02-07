@@ -24,24 +24,32 @@ export class AnsweredTestsController extends BaseController {
 
   @Get('/list')
   async getList(@Query('id') id) {
-    const items = await this.prisma.$queryRawUnsafe(`
-        select at.id,
-               m.id                          memberId,
-               concat(m.name, ' ', m.family) fullName,
-               m.schoolName,
-               m.educationLevel,
-               c.title                       city,
-               m.zone,
-               m.mobileNumber,
-               pt.title                      testTitle,
-               at.creationTime
-        from member_answered_tests at
+    let items = [];
+
+
+    try {
+      items = await this.prisma.$queryRawUnsafe(`
+          select at.id,
+                 m.id                          memberId,
+                 concat(m.name, ' ', m.family) fullName,
+                 m.schoolName,
+                 m.educationLevel,
+                 c.title                       city,
+                 m.zone,
+                 m.mobileNumber,
+                 pt.title                      testTitle,
+                 at.creationTime
+          from member_answered_tests at
          inner join members m
-        on m.id = at.userId
-            inner join published_tests pt on pt.id = at.publishedTestItemId
-            left join cities c on c.cityId = m.city
-            ${id ? `where pt.id = '${id}'` : ''}
-    `);
+          on m.id = at.userId
+              inner join published_tests pt on pt.id = at.publishedTestItemId
+              left join cities c on c.cityId = m.city
+              ${id ? `where pt.id = '${id}'` : ''}
+      `);
+    } catch (e) {
+
+    }
+
     const tests = await this.prisma.published_tests.findMany();
 
     return {
@@ -56,7 +64,7 @@ export class AnsweredTestsController extends BaseController {
 
   @Get('/download-excel/:testId')
   async downloadExcel(@Param('testId') testId) {
-    const items: any[] = await this.prisma.$queryRawUnsafe(`
+    const q = `
         select at.id,
                m.id     memberId,
                m.name,
@@ -76,30 +84,22 @@ export class AnsweredTestsController extends BaseController {
             inner join published_tests pt on pt.id = at.publishedTestItemId
             left join cities c on c.cityId = m.city
         where at.publishedTestItemId = '${testId}'
-    `);
-
+    `;
+    const items: any[] = await this.prisma.$queryRawUnsafe(q);
     const final = [];
-
-
+    let answered_test_items = await this.prisma.answered_test_items.findMany();
+    const questionItems = await this.prisma.test_questions.findMany({});
+    const answerItems = await this.prisma.test_question_answer_items.findMany();
     for (let i = 0; i < items.length; i++) {
 
       const f = items[i];
       let score = 0;
 
-      const answered_test_items = await this.prisma.answered_test_items.findMany({
-        where: {
-          parentAnswerItemId: f.id,
-        },
-      });
+      answered_test_items = answered_test_items.filter(x => x.parentAnswerItemId == f.id);
 
       let stringifyData = [];
       await Promise.all(answered_test_items.map(async (answerTestItem) => {
-        const questionItem = await this.prisma.test_questions.findFirst({
-          where: {
-            id: answerTestItem.questionId,
-          },
-        });
-
+        const questionItem = questionItems.find(x => x.id == answerTestItem.questionId);
 
         if (answerTestItem.answerContent == questionItem.correctAnswerId) {
           score += questionItem.questionScore;
@@ -107,25 +107,27 @@ export class AnsweredTestsController extends BaseController {
 
         let answerItem;
         if (answerTestItem.answerContent) {
-          answerItem = await this.prisma.test_question_answer_items.findFirst({
-            where: {
-              OR: [
-                { id: answerTestItem.answerContent },
-                { value: answerTestItem.answerContent },
-              ],
-            },
-          });
+          answerItem = answerItems.find(x =>
+            x.id == answerTestItem.answerContent ||
+            x.value == answerTestItem.answerContent,
+          );
         }
 
         stringifyData.push({
           id: this.helper.generateUuid(),
           questionTitle: questionItem.questionTitle,
           answerContent: answerItem ? answerItem.label : null,
-
         });
-        f.stringifyData = stringifyData;
-
+        // f.stringifyData = stringifyData || [];
       }));
+
+
+      if (f.stringifyData) {
+        f.stringifyData = JSON.parse(f.stringifyData);
+        f.stringifyData.map(dataItem => {
+          score += dataItem.score;
+        });
+      }
 
       final.push({
         ...f,
