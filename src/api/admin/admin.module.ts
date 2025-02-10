@@ -18,10 +18,10 @@ import { TestTemplateController } from './test-template/test-template.controller
 import { FormTemplateController } from './form-template/form-template.controller';
 import { FormTemplateItemsController } from './form-template-items/form-template-items.controller';
 import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
-import { TestController } from './test/test.controller';
 import { TestQuestionController } from './test-question/test-question.controller';
 import { PublishedTestController } from './published-test/published-test.controller';
 import { AnsweredTestsController } from './answered-tests/answered-tests.controller';
+import { QuestionBankController } from './question-bank/question-bank.controller';
 
 @Module({
   controllers: [
@@ -38,10 +38,10 @@ import { AnsweredTestsController } from './answered-tests/answered-tests.control
     FormTemplateController,
     FormTemplateItemsController,
     AnswerSheetController,
-    TestController,
     TestQuestionController,
     PublishedTestController,
     AnsweredTestsController,
+    QuestionBankController,
   ],
   providers: [
     AccessPermissionService,

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUpdateTestQuestionDto {
+export class CreateUpdateQuestionItemDto {
   @ApiProperty()
   title: string;
 
@@ -11,7 +11,7 @@ export class CreateUpdateTestQuestionDto {
   items: any[];
 
   @ApiProperty()
-  parentId: string;
+  parentQuestionBankId: string;
 
   @ApiProperty()
   correctAnswer: number;
