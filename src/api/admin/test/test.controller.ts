@@ -107,6 +107,8 @@ export class TestController extends BaseController {
 
       if (questionType == 'چهار گزینه ای') {
         questionType = 1;
+      } else {
+        questionType = 2;
       }
 
       const transactions = [];
