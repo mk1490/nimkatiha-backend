@@ -276,21 +276,21 @@ model answer_sheet_items {
   creationTime        DateTime @default(now())
 }
 
-model tests {
+model question_bank {
   id           String   @id() @default(uuid())
   title        String
   slug         String?
   creationTime DateTime @default(now())
 }
 
-model test_questions {
-  id              String   @id() @default(uuid())
-  parentId        String
-  questionTitle   String
-  questionType    Int
-  questionScore   Int
-  correctAnswerId String?
-  creationTime    DateTime @default(now())
+model question_bank_questions {
+  id                   String   @id() @default(uuid())
+  parentQuestionBankId String
+  questionTitle        String
+  questionType         Int
+  questionScore        Int
+  correctAnswerId      String?
+  creationTime         DateTime @default(now())
 }
 
 model test_question_answer_items {

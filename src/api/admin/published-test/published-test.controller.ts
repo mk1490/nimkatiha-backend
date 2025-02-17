@@ -11,7 +11,7 @@ export class PublishedTestController extends BaseController {
 
   @Get('/initialize')
   async initialize() {
-    const items = await this.prisma.tests.findMany();
+    const items = await this.prisma.question_bank.findMany();
     return {
       tests: items.map(f => {
         return this.helper.getKeyValue(f.title, f.id);
