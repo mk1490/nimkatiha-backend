@@ -206,10 +206,11 @@ model cities {
 }
 
 model test_templates {
-  id      String  @id() @default(uuid())
-  title   String
-  visible Boolean @default(true)
-  slug    String
+  id           String  @id() @default(uuid())
+  title        String
+  visible      Boolean @default(true)
+  authRequired Boolean @default(false)
+  slug         String
 }
 
 model test_template_levels {

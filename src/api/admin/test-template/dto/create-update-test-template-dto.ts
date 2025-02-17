@@ -12,4 +12,7 @@ export class CreateUpdateTestTemplateDto {
   @ApiProperty()
   items: any[];
 
+  @ApiProperty()
+  authRequired: boolean;
+
 }

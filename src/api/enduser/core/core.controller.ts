@@ -19,8 +19,6 @@ export class CoreController extends BaseController {
   }
 
 
-
-
   @Get('/initialize')
   async initialize(
     @Headers('authorization') authorization,
@@ -76,6 +74,7 @@ export class CoreController extends BaseController {
 
     return {
       success: true,
+      authRequired: testTemplateItem.authRequired,
       questionnaireId: testTemplateItem.id,
       questionnaireTitle: testTemplateItem.title,
       mobileNumber: memberItem ? memberItem.mobileNumber : '',
