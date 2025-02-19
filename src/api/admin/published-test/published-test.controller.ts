@@ -130,17 +130,18 @@ export class PublishedTestController extends BaseController {
     @Body() input: CreateUpdatePublishedTestDto) {
 
     const itemExists = await this.prisma.published_tests.findFirst({
-      where:{
+      where: {
         id,
-      }
-    })
+      },
+    });
 
-    if (itemExists.slug != input.slug){
+    if (itemExists.slug != input.slug) {
       await this.checkSlug(input.slug);
     }
 
     const transactions = [];
 
+    console.log(input);
     transactions.push(this.prisma.published_tests.update({
       where: {
         id,

@@ -15,4 +15,10 @@ export class CreateUpdateTestTemplateDto {
   @ApiProperty()
   authRequired: boolean;
 
+  @ApiProperty()
+  preText: string;
+
+  @ApiProperty()
+  afterText: string;
+
 }

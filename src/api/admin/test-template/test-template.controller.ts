@@ -63,6 +63,8 @@ export class TestTemplateController extends BaseController {
         title: input.title,
         slug: input.slug,
         authRequired: input.authRequired,
+        preText: input.preText,
+        afterText: input.afterText,
       },
     }));
 
@@ -144,6 +146,8 @@ export class TestTemplateController extends BaseController {
         title: input.title,
         slug: input.slug,
         authRequired: input.authRequired,
+        preText: input.preText,
+        afterText: input.afterText,
       },
     }));
 
