@@ -284,14 +284,16 @@ model question_bank {
   creationTime DateTime @default(now())
 }
 
-model question_bank_questions {
-  id                   String   @id() @default(uuid())
-  parentQuestionBankId String
-  questionTitle        String
-  questionType         Int
-  questionScore        Int
-  correctAnswerId      String?
-  creationTime         DateTime @default(now())
+// model question_bank_questions {
+model test_questions {
+  id              String   @id() @default(uuid())
+  parentId        String
+  // parentQuestionBankId String
+  questionTitle   String
+  questionType    Int
+  questionScore   Int
+  correctAnswerId String?
+  creationTime    DateTime @default(now())
 }
 
 model test_question_answer_items {

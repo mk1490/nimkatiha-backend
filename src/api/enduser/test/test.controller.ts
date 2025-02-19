@@ -21,8 +21,6 @@ export class TestController extends BaseController {
   }
 
 
-
-
   @Get('/list')
   async getList(@CurrentMember() currentMember) {
     if (!currentMember)
@@ -79,16 +77,16 @@ export class TestController extends BaseController {
   @Get('/status/:slugOrId')
   async getTestStatus(
     @CurrentMember() currentMember,
-    @Param('slugOrId') slugOrId){
+    @Param('slugOrId') slugOrId) {
 
     const publishedTestItem = await this.prisma.published_tests.findFirst({
-      where:{
+      where: {
         OR: [
-          {id: slugOrId},
-          {slug: slugOrId},
-        ]
-      }
-    })
+          { id: slugOrId },
+          { slug: slugOrId },
+        ],
+      },
+    });
 
     const answerTestItem = await this.prisma.member_answered_tests.findFirst({
       where: {
@@ -180,6 +178,7 @@ export class TestController extends BaseController {
       const testItem = testItems.find(x => x.id == f.testTemplateId);
       let tempQuestions = await this.prisma.test_questions.findMany({
         where: {
+          // parentQuestionBankId: testItem.id,
           parentId: testItem.id,
         },
       });

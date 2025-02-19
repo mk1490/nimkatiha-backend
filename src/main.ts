@@ -20,6 +20,9 @@ async function bootstrap() {
     uploadedDocuments: (userId) => {
       return join(global.directories.public, 'uploaded-documents', userId);
     },
+    excelBackup: () => {
+      return join(global.directories.public, 'excel-backup');
+    },
   };
 
   const app = await NestFactory.create(AppModule);
