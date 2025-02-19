@@ -77,6 +77,8 @@ export class CoreController extends BaseController {
       authRequired: testTemplateItem.authRequired,
       questionnaireId: testTemplateItem.id,
       questionnaireTitle: testTemplateItem.title,
+      preText: testTemplateItem.preText,
+      afterText: testTemplateItem.afterText,
       mobileNumber: memberItem ? memberItem.mobileNumber : '',
 
       levels: levels.map(f => {
