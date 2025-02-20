@@ -26,6 +26,7 @@ import { FileController } from './file/file.controller';
 import { CoachController } from './coach/coach.controller';
 import { CourseController } from './course/course.controller';
 import { CoachCategoryController } from './coach-category/coach-category.controller';
+import { CourseEpisodeController } from './course-episode/course-episode.controller';
 
 @Module({
   controllers: [
@@ -50,6 +51,7 @@ import { CoachCategoryController } from './coach-category/coach-category.control
     CoachController,
     CourseController,
     CoachCategoryController,
+    CourseEpisodeController,
   ],
   providers: [
     AccessPermissionService,

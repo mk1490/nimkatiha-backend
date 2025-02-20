@@ -397,3 +397,12 @@ model course_visibility_for {
   coachCategoryId String
   creationTime    DateTime @default(now())
 }
+
+model course_episodes {
+  id             String   @id() @default(uuid())
+  title          String
+  type           Int
+  metaData       String
+  parentCourseId String
+  creationTime   DateTime @default(now())
+}
