@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateCoachDto } from './dto/create-update-coach-dto';
 
@@ -75,5 +75,20 @@ export class CoachController extends BaseController {
     });
   }
 
+  @Delete('/:id')
+  async delete(@Param('id') id) {
+    const transactions = [];
+    transactions.push(this.prisma.coach_categories.deleteMany({
+      where: {
+        id: id,
+      },
+    }));
+    transactions.push(this.prisma.coach_joined_categories.deleteMany({
+      where: {
+        categoryId: id,
+      },
+    }));
+    await this.prisma.$transaction(transactions);
+  }
 
 }
