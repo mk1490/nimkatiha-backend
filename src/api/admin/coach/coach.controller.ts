@@ -10,6 +10,17 @@ export class CoachController extends BaseController {
     super();
   }
 
+
+  @Get('/initialize')
+  async initialize() {
+    const coachCategories = await this.prisma.coach_categories.findMany();
+    return {
+      coachCategories: coachCategories.map(f => {
+        return this.helper.getKeyValue(f.title, f.id);
+      }),
+    };
+  }
+
   @Get('/list')
   async getList() {
     const items = await this.prisma.coachs.findMany();
@@ -32,7 +43,7 @@ export class CoachController extends BaseController {
         nationalCode: input.nationalCode,
         mobileNumber: input.mobileNumber,
         username: input.username,
-        password: await this.helper.generateHashPassword(input.password),
+        password: input.password ? await this.helper.generateHashPassword(input.password) : null,
       },
     }));
 
@@ -59,7 +70,7 @@ export class CoachController extends BaseController {
         nationalCode: input.nationalCode,
         mobileNumber: input.mobileNumber,
         username: input.username,
-        password: await this.helper.generateHashPassword(input.password),
+        password: input.password ? await this.helper.generateHashPassword(input.password) : null,
       },
     });
   }
