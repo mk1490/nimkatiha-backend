@@ -23,6 +23,9 @@ import { PublishedTestController } from './published-test/published-test.control
 import { AnsweredTestsController } from './answered-tests/answered-tests.controller';
 import { QuestionBankController } from './question-bank/question-bank.controller';
 import { FileController } from './file/file.controller';
+import { CoachController } from './coach/coach.controller';
+import { CourseController } from './course/course.controller';
+import { CoachCategoryController } from './coach-category/coach-category.controller';
 
 @Module({
   controllers: [
@@ -44,6 +47,9 @@ import { FileController } from './file/file.controller';
     AnsweredTestsController,
     QuestionBankController,
     FileController,
+    CoachController,
+    CourseController,
+    CoachCategoryController,
   ],
   providers: [
     AccessPermissionService,
