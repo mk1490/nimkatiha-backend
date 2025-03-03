@@ -210,7 +210,7 @@ model test_templates {
   title        String
   visible      Boolean @default(true)
   authRequired Boolean @default(false)
-  preText      String?
+  preText      String? @db.LongText
   afterText    String?
   slug         String
 }
