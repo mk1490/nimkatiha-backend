@@ -406,3 +406,12 @@ model course_episodes {
   parentCourseId String
   creationTime   DateTime @default(now())
 }
+
+model course_episode_joined_categories {
+  id             String   @id() @default(uuid())
+  title          String
+  type           Int
+  metaData       String
+  parentCourseId String
+  creationTime   DateTime @default(now())
+}
