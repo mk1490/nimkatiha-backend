@@ -291,7 +291,7 @@ model test_questions {
   id              String   @id() @default(uuid())
   parentId        String
   // parentQuestionBankId String
-  questionTitle   String
+  questionTitle   String   @db.LongText
   questionType    Int
   questionScore   Int
   correctAnswerId String?
