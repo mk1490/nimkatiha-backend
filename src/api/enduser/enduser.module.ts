@@ -13,9 +13,10 @@ import { JwtService } from '@nestjs/jwt';
 import { FormAnswerController } from './form-answer/form-answer.controller';
 import { TestController } from './test/test.controller';
 import { QuestionnaireController } from './questionnaire/questionnaire.controller';
+import { CourseController } from './course/course.controller';
 
 @Module({
-  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController, TestController, QuestionnaireController],
+  controllers: [CoreController, AuthController, MemberRequestController, FormAnswerController, TestController, QuestionnaireController, CourseController],
   providers: [
     SettingsService,
     SmsService,

@@ -28,6 +28,30 @@ export class CourseController extends BaseController {
   }
 
 
+  @Get('/:parentPublishedTestId')
+  async getDetails(@Param('parentPublishedTestId') parentPublishedTestId) {
+
+    const item = await this.prisma.course.findFirst({
+      where: {
+        id: parentPublishedTestId,
+      },
+    });
+    const joinedItems = await this.prisma.course_episode_joined_categories.findMany({
+      where:{
+        parentCourseEpisodeId: item.id,
+      }
+    })
+
+    return {
+      data: {
+        ...item,
+        joinedCategoryIds: joinedItems.map(f=> f.parentCategoryId),
+      },
+      initialize: await this.initialize(),
+    };
+  }
+
+
   @Post()
   async create(@Body() input: CreateUpdateCourseDto) {
     const transactions = [];

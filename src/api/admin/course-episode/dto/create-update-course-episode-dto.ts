@@ -3,6 +3,7 @@ export class CreateUpdateCourseEpisodeDto {
   parentId: string;
   metaData: string;
   type: number;
+  joinedCategoryIds: string[];
 
 
 }

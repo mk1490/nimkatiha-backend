@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateCourseEpisodeDto } from './dto/create-update-course-episode-dto';
 
@@ -35,14 +35,74 @@ export class CourseEpisodeController extends BaseController {
 
   @Post()
   async create(@Body() input: CreateUpdateCourseEpisodeDto) {
+    const transactions = [];
 
+    const id = this.helper.generateUuid();
 
-    return await this.prisma.course_episodes.create({
+    transactions.push(this.prisma.course_episodes.create({
       data: {
+        id,
         title: input.title,
         type: input.type,
         parentCourseId: input.parentId,
         metaData: input.metaData,
+      },
+    }));
+
+    transactions.push(this.prisma.course_episode_joined_categories.createMany({
+      data: input.joinedCategoryIds.map(f => {
+        return {
+          parentCourseEpisodeId: id,
+          parentCategoryId: f,
+        };
+      }),
+    }));
+
+    await this.prisma.$transaction(transactions);
+    return await this.prisma.course_episodes.findFirst({
+      where: {
+        id,
+      },
+    });
+  }
+
+  @Put('/:id')
+  async update(
+    @Param('id') id,
+    @Body() input: CreateUpdateCourseEpisodeDto) {
+    const transactions = [];
+
+    transactions.push(this.prisma.course_episodes.update({
+      where: {
+        id,
+      },
+      data: {
+        title: input.title,
+        type: input.type,
+        metaData: input.metaData,
+      },
+    }));
+
+
+    transactions.push(this.prisma.course_episode_joined_categories.deleteMany({
+      where: {
+        parentCourseEpisodeId: id,
+      },
+    }));
+
+    transactions.push(this.prisma.course_episode_joined_categories.createMany({
+      data: input.joinedCategoryIds.map(f => {
+        return {
+          parentCourseEpisodeId: id,
+          parentCategoryId: f,
+        };
+      }),
+    }));
+
+    await this.prisma.$transaction(transactions);
+    return await this.prisma.course_episodes.findFirst({
+      where: {
+        id,
       },
     });
   }

@@ -402,7 +402,21 @@ model course_episodes {
   id             String   @id() @default(uuid())
   title          String
   type           Int
-  metaData       String
+  metaData       String   @db.LongText
   parentCourseId String
   creationTime   DateTime @default(now())
+}
+
+model course_episode_joined_categories {
+  id                    String   @id() @default(uuid())
+  parentCourseEpisodeId String
+  parentCategoryId      String
+  creationTime          DateTime @default(now())
+}
+
+model zendegiBaAyeha {
+  id           String   @id() @default(uuid())
+  title        String
+  content      String
+  creationTime DateTime @default(now())
 }
