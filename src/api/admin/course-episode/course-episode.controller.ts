@@ -108,4 +108,24 @@ export class CourseEpisodeController extends BaseController {
   }
 
 
+  @Put('/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() input: CreateUpdateCourseEpisodeDto) {
+
+
+    return await this.prisma.course_episodes.update({
+      where:{
+        id,
+      },
+      data: {
+        title: input.title,
+        type: input.type,
+        parentCourseId: input.parentId,
+        metaData: input.metaData,
+      },
+    });
+  }
+
+
 }

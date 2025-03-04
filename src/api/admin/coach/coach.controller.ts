@@ -23,11 +23,15 @@ export class CoachController extends BaseController {
 
   @Get('/list')
   async getList() {
-    const items = await this.prisma.coachs.findMany();
-    return items.map(f => {
-      delete f.password;
-      return f;
-    });
+    return await this.prisma.$queryRawUnsafe(`
+      select
+        c.id,
+        c.name,
+        c.family,
+        c.nationalCode,
+        c.mobileNumber
+        from coachs c
+    `)
   }
 
 
