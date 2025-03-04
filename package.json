@@ -39,7 +39,8 @@
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.2",
     "tus-node-server": "^0.9.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "json-as-xlsx": "^2.5.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.5",

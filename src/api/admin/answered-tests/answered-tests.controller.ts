@@ -1,5 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
+import xlsx from 'json-as-xlsx';
+import { writeFileSync } from 'fs';
 
 @Controller('answered-tests')
 export class AnsweredTestsController extends BaseController {
@@ -135,6 +137,76 @@ export class AnsweredTestsController extends BaseController {
       });
 
     }
+
+
+    const _h = [
+      {label: 'ردیف', value: 'row'},
+      {label: 'عنوان کتاب', value: 'testTitle'},
+      {label: 'شماره تلفن همراه', value: 'mobileNumber'},
+      {label: 'نام', value: 'name'},
+      {label: 'نام خانوادگی', value: 'family'},
+      {label: 'کد ملّی', value: 'nationalCode'},
+      {label: 'نام مدرسه', value: 'schoolName'},
+      {label: 'پایه تحصیلی', value: 'educationLevel'},
+      {label: 'شهرستان', value: 'city'},
+      {label: 'ناحیه', value: 'zone'},
+      // {label: 'زمان', value: 'creationTime'},
+      {label: 'مجموع امتیاز', value: 'totalScore'},
+    ]
+
+    const fileName = `Nimkatiha_survey_response_template_${this.helper.generateUuid()}`
+
+    let settings = {
+      fileName: fileName,
+      writeMode: 'writeFile',
+      RTL: true,
+      writeOptions: {},
+    };
+
+    let hasDataIndex = -1;
+    final.map((f, i) => {
+      if (f.stringifyData && f.stringifyData.length > 0 && hasDataIndex == -1) {
+        hasDataIndex = i;
+      }
+    })
+
+
+    final.map(f => {
+      if (f.stringifyData) {
+        f.stringifyData.map((questionItem, questionIndex) => {
+          _h.push({
+            label: questionItem.questionTitle,
+            value: questionItem.questionTitle
+          })
+        })
+      }
+    })
+
+
+    let _c = [...final].map((f, i) => {
+      f.row = i + 1;
+      return f;
+    })
+
+    final.map((f, i) => {
+      if (f.stringifyData) {
+        f.stringifyData.map((questionItem, questionIndex) => {
+          _c[i][questionItem.questionTitle] = questionItem.answerContent
+        })
+      }
+    })
+
+    //
+    // const file = xlsx([{
+    //   sheet: 'Main',
+    //   content: _c,
+    //   columns: _h,
+    // }], settings);
+    //
+    // const directory = global.directories.excelBackup()
+    // writeFileSync(directory + '/' + fileName + '.xlsx',file)
+    //
+
 
     return final;
   }

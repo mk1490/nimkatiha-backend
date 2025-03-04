@@ -54,8 +54,6 @@ export class TestTemplateController extends BaseController {
   @Post()
   async create(@Body() input: CreateUpdateTestTemplateDto) {
     const transaction = [];
-
-
     const id = this.helper.generateUuid();
 
 
@@ -64,6 +62,9 @@ export class TestTemplateController extends BaseController {
         id: id,
         title: input.title,
         slug: input.slug,
+        authRequired: input.authRequired,
+        preText: input.preText,
+        afterText: input.afterText,
       },
     }));
 
@@ -144,6 +145,9 @@ export class TestTemplateController extends BaseController {
       data: {
         title: input.title,
         slug: input.slug,
+        authRequired: input.authRequired,
+        preText: input.preText,
+        afterText: input.afterText,
       },
     }));
 

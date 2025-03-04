@@ -18,11 +18,16 @@ import { TestTemplateController } from './test-template/test-template.controller
 import { FormTemplateController } from './form-template/form-template.controller';
 import { FormTemplateItemsController } from './form-template-items/form-template-items.controller';
 import { AnswerSheetController } from './answer-sheet/answer-sheet.controller';
-import { TestController } from './test/test.controller';
 import { TestQuestionController } from './test-question/test-question.controller';
 import { PublishedTestController } from './published-test/published-test.controller';
 import { AnsweredTestsController } from './answered-tests/answered-tests.controller';
+import { QuestionBankController } from './question-bank/question-bank.controller';
 import { FileController } from './file/file.controller';
+import { CoachController } from './coach/coach.controller';
+import { CourseController } from './course/course.controller';
+import { CoachCategoryController } from './coach-category/coach-category.controller';
+import { CourseEpisodeController } from './course-episode/course-episode.controller';
+import { ZendegiBaAyehaController } from './zendegi-ba-ayeha/zendegi-ba-ayeha.controller';
 
 @Module({
   controllers: [
@@ -39,11 +44,16 @@ import { FileController } from './file/file.controller';
     FormTemplateController,
     FormTemplateItemsController,
     AnswerSheetController,
-    TestController,
     TestQuestionController,
     PublishedTestController,
     AnsweredTestsController,
+    QuestionBankController,
     FileController,
+    CoachController,
+    CourseController,
+    CoachCategoryController,
+    CourseEpisodeController,
+    ZendegiBaAyehaController,
   ],
   providers: [
     AccessPermissionService,

@@ -248,6 +248,9 @@ CREATE TABLE `test_templates` (
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT true,
+    `authRequired` BOOLEAN NOT NULL DEFAULT false,
+    `preText` VARCHAR(191) NULL,
+    `afterText` VARCHAR(191) NULL,
     `slug` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -339,7 +342,7 @@ CREATE TABLE `answer_sheet_items` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `tests` (
+CREATE TABLE `question_bank` (
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NULL,
@@ -379,7 +382,10 @@ CREATE TABLE `published_tests` (
     `description` VARCHAR(191) NULL,
     `endDescription` VARCHAR(191) NULL,
     `time` INTEGER NULL,
+    `educationalConditions` VARCHAR(191) NULL,
+    `authenticationRequired` BOOLEAN NOT NULL DEFAULT false,
     `isActive` BOOLEAN NOT NULL DEFAULT true,
+    `slug` VARCHAR(191) NULL,
     `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -427,6 +433,90 @@ CREATE TABLE `questionnaire_members` (
     `questionnaireId` VARCHAR(191) NOT NULL,
     `memberId` VARCHAR(191) NOT NULL,
     `status` INTEGER NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `uploaded_files` (
+    `id` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `fileId` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `coachs` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `family` VARCHAR(191) NOT NULL,
+    `nationalCode` VARCHAR(191) NULL,
+    `mobileNumber` VARCHAR(191) NULL,
+    `username` VARCHAR(191) NULL,
+    `password` VARCHAR(191) NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `coach_categories` (
+    `id` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `coach_joined_categories` (
+    `id` VARCHAR(191) NOT NULL,
+    `coachId` VARCHAR(191) NOT NULL,
+    `categoryId` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `course` (
+    `id` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `course_visibility_for` (
+    `id` VARCHAR(191) NOT NULL,
+    `courseId` VARCHAR(191) NOT NULL,
+    `coachCategoryId` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `course_episodes` (
+    `id` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `type` INTEGER NOT NULL,
+    `metaData` VARCHAR(191) NOT NULL,
+    `parentCourseId` VARCHAR(191) NOT NULL,
+    `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `zendegiBaAyeha` (
+    `id` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `content` VARCHAR(191) NOT NULL,
     `creationTime` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)

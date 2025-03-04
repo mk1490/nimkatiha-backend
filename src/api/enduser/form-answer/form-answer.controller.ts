@@ -18,7 +18,7 @@ export class FormAnswerController extends BaseController {
     @Param('levelId') levelId,
     @Body() input,
   ) {
-    const memberId = currentMember.id;
+    const memberId = currentMember ? currentMember.id : '';
 
 
     const testTemplateLevel = await this.prisma.test_template_levels.findFirst({

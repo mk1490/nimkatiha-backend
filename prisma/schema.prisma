@@ -206,10 +206,13 @@ model cities {
 }
 
 model test_templates {
-  id      String  @id() @default(uuid())
-  title   String
-  visible Boolean @default(true)
-  slug    String
+  id           String  @id() @default(uuid())
+  title        String
+  visible      Boolean @default(true)
+  authRequired Boolean @default(false)
+  preText      String? @db.LongText
+  afterText    String?
+  slug         String
 }
 
 model test_template_levels {
@@ -276,17 +279,19 @@ model answer_sheet_items {
   creationTime        DateTime @default(now())
 }
 
-model tests {
+model question_bank {
   id           String   @id() @default(uuid())
   title        String
   slug         String?
   creationTime DateTime @default(now())
 }
 
+// model question_bank_questions {
 model test_questions {
   id              String   @id() @default(uuid())
   parentId        String
-  questionTitle   String
+  // parentQuestionBankId String
+  questionTitle   String   @db.LongText
   questionType    Int
   questionScore   Int
   correctAnswerId String?
@@ -354,4 +359,50 @@ model uploaded_files {
   title        String
   fileId       String
   creationTime DateTime @default(now())
+}
+
+model coachs {
+  id           String   @id() @default(uuid())
+  name         String
+  family       String
+  nationalCode String?
+  mobileNumber String?
+  username     String?
+  password     String?
+  creationTime DateTime @default(now())
+}
+
+model coach_categories {
+  id           String   @id() @default(uuid())
+  title        String
+  creationTime DateTime @default(now())
+}
+
+model coach_joined_categories {
+  id           String   @id() @default(uuid())
+  coachId      String
+  categoryId   String
+  creationTime DateTime @default(now())
+}
+
+model course {
+  id           String   @id() @default(uuid())
+  title        String
+  creationTime DateTime @default(now())
+}
+
+model course_visibility_for {
+  id              String   @id() @default(uuid())
+  courseId        String
+  coachCategoryId String
+  creationTime    DateTime @default(now())
+}
+
+model course_episodes {
+  id             String   @id() @default(uuid())
+  title          String
+  type           Int
+  metaData       String
+  parentCourseId String
+  creationTime   DateTime @default(now())
 }
