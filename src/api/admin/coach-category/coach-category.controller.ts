@@ -14,7 +14,7 @@ export class CoachCategoryController extends BaseController {
   }
 
 
-  @Post('/add-update/:id?')
+  @Post('/add-update{/:id}')
   async createOrUpdate(
     @Param('id') id,
     @Body('title') title,
