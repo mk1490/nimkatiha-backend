@@ -9,7 +9,7 @@ import * as express from 'express';
 import { FileStore } from '@tus/file-store';
 
 async function bootstrap() {
-  const listenPort = 3000;
+  const listenPort = 3002;
   global.directories = {
     public: join(homedir(), '/nimkatiha/public'),
     private: join(homedir(), '/nimkatiha/private'),
