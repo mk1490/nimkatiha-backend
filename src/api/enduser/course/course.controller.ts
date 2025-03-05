@@ -1,4 +1,23 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { BaseController } from '../../../base/base-controller';
 
 @Controller('course')
-export class CourseController {}
+export class CourseController extends BaseController {
+
+  constructor() {
+    super();
+  }
+
+
+  @Get('/list')
+  async getList() {
+    const items = await this.prisma.course.findMany();
+    return items.map(f => {
+      return {
+        title: f.title,
+        id: f.id,
+      };
+    });
+  }
+
+}

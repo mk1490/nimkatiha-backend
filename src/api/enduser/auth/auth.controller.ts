@@ -88,12 +88,12 @@ export class AuthController extends BaseController {
 
   @Post('/login')
   async login(@Body() input: LoginDto) {
-    const coachItem = await this.prisma.coachs.findUnique({
+    const coachItem = await this.prisma.coachs.findFirst({
       where: {
         username: input.username,
       },
     });
-    if (!coachItem)
+    if (input.username && !coachItem)
       throw new NotAcceptableException('نام کاربری وارد شده معتبر نیست!');
 
 
