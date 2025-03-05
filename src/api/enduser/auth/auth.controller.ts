@@ -21,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constants';
 import { UpdateProfileDto } from './dto/update-profile-dto';
 import { CoreService } from '../../../service/core/core.service';
+import { LoginDto } from '../../auth/dto/login-dto';
 
 @ApiTags('Auth (enduser)')
 @Controller('auth')
@@ -39,7 +40,7 @@ export class AuthController extends BaseController {
 
   @Get('/initialize')
   async initialize(@Query('grades') grades) {
-    return await this.coreService.initializeAuth(grades && grades == 'all')
+    return await this.coreService.initializeAuth(grades && grades == 'all');
   }
 
 
@@ -85,35 +86,61 @@ export class AuthController extends BaseController {
   }
 
 
+  @Post('/login')
+  async login(@Body() input: LoginDto) {
+    const coachItem = await this.prisma.coachs.findUnique({
+      where: {
+        username: input.username,
+      },
+    });
+    if (!coachItem)
+      throw new NotAcceptableException('نام کاربری وارد شده معتبر نیست!');
+
+
+    const payload = {
+      username: coachItem.username,
+      sub: coachItem.id,
+      type: 'normal',
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload, {
+        secret: jwtConstants.privateKey,
+        expiresIn: '300d',
+      }),
+    };
+  }
+
+
   @Post('/update-profile')
   async updateProfile(
     @Headers('authorization') authorization,
     @Body() input: UpdateProfileDto) {
 
-    if (input.mobileNumber){
+    if (input.mobileNumber) {
 
       let userItem = await this.prisma.members.findFirst({
-        where:{
+        where: {
           mobileNumber: input.mobileNumber,
-        }
-      })
+        },
+      });
 
-      if (!userItem){
-       userItem = await this.prisma.members.create({
-        data:{
-          name: input.name,
-          family: input.family,
-          city: String(input.city),
-          nationalCode: input.nationalCode,
-          mobileNumber: input.mobileNumber,
-          schoolName: input.schoolName,
-          fatherName: input.fatherName,
-          educationLevel: Number(input.educationLevel),
-          zone: String(input.zone),
-          status: 1,
-        }
-      })
-      }else {
+      if (!userItem) {
+        userItem = await this.prisma.members.create({
+          data: {
+            name: input.name,
+            family: input.family,
+            city: String(input.city),
+            nationalCode: input.nationalCode,
+            mobileNumber: input.mobileNumber,
+            schoolName: input.schoolName,
+            fatherName: input.fatherName,
+            educationLevel: Number(input.educationLevel),
+            zone: String(input.zone),
+            status: 1,
+          },
+        });
+      } else {
         userItem = await this.prisma.members.update({
           where: {
             id: userItem.id,
@@ -145,7 +172,7 @@ export class AuthController extends BaseController {
 
       };
 
-    }else {
+    } else {
 
       const jwtUser = await this.jwtService.verifyAsync(authorization.replaceAll('Bearer ', ''), {
         secret: jwtConstants.privateKey,
