@@ -12,6 +12,7 @@ export class CourseEpisodeController extends BaseController {
     @Get('initialize')
     async initialize() {
         const testTemplates = await this.prisma.question_bank.findMany();
+        const prerequisites = await this.prisma.course_episodes.findMany();
         return {
             types: [
                 this.helper.getKeyValue('ویدئو', 1),
@@ -20,6 +21,9 @@ export class CourseEpisodeController extends BaseController {
             testBanks: testTemplates.map(f => {
                 return this.helper.getKeyValue(f.title, f.id);
             }),
+            prerequisites: prerequisites.map(f=>{
+                return this.helper.getKeyValue(f.title, f.id);
+            })
         };
     }
 
@@ -45,17 +49,9 @@ export class CourseEpisodeController extends BaseController {
                 title: input.title,
                 type: input.type,
                 parentCourseId: input.parentId,
+                prerequisites: input.prerequisites,
                 metaData: input.metaData,
             },
-        }));
-
-        transactions.push(this.prisma.course_episode_joined_categories.createMany({
-            data: input.joinedCategoryIds.map(f => {
-                return {
-                    parentCourseEpisodeId: id,
-                    parentCategoryId: f,
-                };
-            }),
         }));
 
         await this.prisma.$transaction(transactions);
@@ -79,25 +75,11 @@ export class CourseEpisodeController extends BaseController {
             data: {
                 title: input.title,
                 type: input.type,
+                prerequisites: input.prerequisites,
                 metaData: input.metaData,
             },
         }));
 
-
-        transactions.push(this.prisma.course_episode_joined_categories.deleteMany({
-            where: {
-                parentCourseEpisodeId: id,
-            },
-        }));
-
-        transactions.push(this.prisma.course_episode_joined_categories.createMany({
-            data: input.joinedCategoryIds.map(f => {
-                return {
-                    parentCourseEpisodeId: id,
-                    parentCategoryId: f,
-                };
-            }),
-        }));
 
         await this.prisma.$transaction(transactions);
         return await this.prisma.course_episodes.findFirst({

@@ -403,6 +403,14 @@ model course_episodes {
   title          String
   type           Int
   metaData       String
+  prerequisites  String?
   parentCourseId String
   creationTime   DateTime @default(now())
+}
+
+model course_observed_episode_items {
+  id           String   @id() @default(uuid())
+  episodeId    String
+  userId       String
+  creationTime DateTime @default(now())
 }

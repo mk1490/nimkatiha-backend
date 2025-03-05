@@ -56,17 +56,25 @@ export class AuthController extends BaseController {
     });
 
 
-    const memberItem = await this.prisma.members.findFirst({
+    let memberOrCoachItem: any = await this.prisma.members.findFirst({
       where: {
         id: jwtUser.sub,
       },
     });
 
+    if (!memberOrCoachItem) {
+      memberOrCoachItem = await this.prisma.coachs.findFirst({
+        where: {
+          id: jwtUser.sub,
+        },
+      });
+    }
 
-    const cities = await this.prisma.cities.findMany();
+
     let cityItem = null;
-    if (memberItem.city) {
-      cityItem = cities.find(x => x.cityId === Number(memberItem.city));
+    if (memberOrCoachItem.city) {
+      const cities = await this.prisma.cities.findMany();
+      cityItem = cities.find(x => x.cityId === Number(memberOrCoachItem.city));
       if (cityItem) {
         cityItem = cityItem.title;
       }
@@ -74,14 +82,14 @@ export class AuthController extends BaseController {
 
 
     return {
-      status: memberItem.status,
-      name: memberItem.name,
-      family: memberItem.family,
-      nationalCode: memberItem.nationalCode,
-      schoolName: memberItem.schoolName,
-      educationLevel: memberItem.educationLevel,
+      status: memberOrCoachItem.status,
+      name: memberOrCoachItem.name,
+      family: memberOrCoachItem.family,
+      nationalCode: memberOrCoachItem.nationalCode,
+      schoolName: memberOrCoachItem.schoolName,
+      educationLevel: memberOrCoachItem.educationLevel,
       city: cityItem,
-      zone: memberItem.zone,
+      zone: memberOrCoachItem.zone,
     };
   }
 
