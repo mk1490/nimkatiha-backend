@@ -85,7 +85,9 @@ export class CourseController extends BaseController {
       where: {
         id,
       },
-      data: {},
+      data: {
+        title: input.title,
+      },
     }));
 
     transactions.push(this.prisma.course_visibility_for.deleteMany({
