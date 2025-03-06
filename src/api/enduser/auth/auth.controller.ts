@@ -72,7 +72,7 @@ export class AuthController extends BaseController {
 
 
     let cityItem = null;
-    if (memberOrCoachItem.city) {
+    if (memberOrCoachItem && memberOrCoachItem.city) {
       const cities = await this.prisma.cities.findMany();
       cityItem = cities.find(x => x.cityId === Number(memberOrCoachItem.city));
       if (cityItem) {
