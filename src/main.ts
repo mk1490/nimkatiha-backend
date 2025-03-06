@@ -37,7 +37,6 @@ async function bootstrap() {
       directory: global.directories.private,
     }),
     path: '/uploads',
-
   });
   const uploadApp = express();
   uploadApp.all('*', server.handle.bind(server));
