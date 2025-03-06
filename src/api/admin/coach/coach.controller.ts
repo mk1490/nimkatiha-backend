@@ -24,14 +24,36 @@ export class CoachController extends BaseController {
   @Get('/list')
   async getList() {
     return await this.prisma.$queryRawUnsafe(`
-      select
-        c.id,
-        c.name,
-        c.family,
-        c.nationalCode,
-        c.mobileNumber
+        select c.id,
+               c.name,
+               c.family,
+               c.nationalCode,
+               c.mobileNumber
         from coachs c
-    `)
+    `);
+  }
+
+
+  @Get('/:id')
+  async getDetails(@Param('id') id: string) {
+    const item = await this.prisma.coachs.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+    const categories = await this.prisma.coach_joined_categories.findMany({
+      where: {
+        coachId: item.id,
+      },
+    });
+    return {
+      initialize: await this.initialize(),
+      data: {
+        ...item,
+        categories: categories.map(f => f.categoryId),
+      },
+    };
   }
 
 
@@ -40,8 +62,10 @@ export class CoachController extends BaseController {
 
     const transactions = [];
 
+    const id = this.helper.generateUuid();
     transactions.push(this.prisma.coachs.create({
       data: {
+        id,
         name: input.name,
         family: input.family,
         nationalCode: input.nationalCode,
@@ -51,22 +75,28 @@ export class CoachController extends BaseController {
       },
     }));
 
+
+    transactions.push(this.prisma.coach_joined_categories.createMany({
+      data: input.categories.map(f => {
+        return {
+          coachId: id,
+          categoryId: f,
+        };
+      }),
+    }));
+
     await this.prisma.$transaction(transactions);
   }
 
-  @Put()
+  @Put('/:id')
   async update(
     @Param('id') id,
     @Body() input: CreateUpdateCoachDto) {
-    return await this.prisma.coachs.create({
-      select: {
-        password: false,
-        id: true,
-        name: true,
-        mobileNumber: true,
-        family: true,
-        username: true,
-        nationalCode: true,
+    const transactions = [];
+
+    transactions.push(this.prisma.coachs.update({
+      where: {
+        id,
       },
       data: {
         name: input.name,
@@ -74,9 +104,31 @@ export class CoachController extends BaseController {
         nationalCode: input.nationalCode,
         mobileNumber: input.mobileNumber,
         username: input.username,
-        password: input.password ? await this.helper.generateHashPassword(input.password) : null,
+      },
+    }));
+    transactions.push(this.prisma.coach_joined_categories.deleteMany({
+      where: {
+        coachId: id,
+      },
+    }));
+
+    transactions.push(this.prisma.coach_joined_categories.createMany({
+      data: input.categories.map(f => {
+        return {
+          coachId: id,
+          categoryId: f,
+        };
+      }),
+    }));
+
+
+    await this.prisma.$transaction(transactions);
+    return await this.prisma.coachs.findFirst({
+      where: {
+        id,
       },
     });
+
   }
 
   @Delete('/:id')

@@ -8,6 +8,9 @@ export class CreateUpdateCoachDto {
   family: string;
 
   @ApiProperty()
+  categories: string[];
+
+  @ApiProperty()
   nationalCode: string;
 
   @ApiProperty()

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateCourseDto } from './dto/create-update-course-dto';
 
@@ -112,4 +112,12 @@ export class CourseController extends BaseController {
     });
   }
 
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    await this.prisma.course.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }
