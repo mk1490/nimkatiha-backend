@@ -18,7 +18,6 @@ export const CurrentCoach = createParamDecorator(async (name: string, ctx: Execu
     const [err, payload] = await to(jwtService.verifyAsync(token.replace('Bearer ', ''), {
       secret: jwtConstants.privateKey,
     }));
-    console.log(err, payload)
     if (!err) {
       const coachItem = await prismaService.coachs.findFirst({
         where: {

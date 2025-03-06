@@ -14,14 +14,15 @@ export class CourseController extends BaseController {
 
 
   @Get('/list')
-  async getList() {
-    const items = await this.prisma.course.findMany();
-    return items.map(f => {
-      return {
-        title: f.title,
-        id: f.id,
-      };
-    });
+  async getList(@CurrentCoach() currentCoach) {
+    return await this.prisma.$queryRawUnsafe(`
+        select c.*
+        from course c
+                 inner join course_visibility_for cvf on cvf.courseId = c.id
+                 inner join coach_joined_categories cjc on cjc.categoryId = cvf.coachCategoryId
+        where cjc.coachId = '${currentCoach.id}'
+        group by c.id
+    `);
   }
 
 
