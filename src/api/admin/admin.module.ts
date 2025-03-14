@@ -28,6 +28,7 @@ import { CourseController } from './course/course.controller';
 import { CoachCategoryController } from './coach-category/coach-category.controller';
 import { CourseEpisodeController } from './course-episode/course-episode.controller';
 import { ZendegiBaAyehaController } from './zendegi-ba-ayeha/zendegi-ba-ayeha.controller';
+import { CourseItemsController } from './course-items/course-items.controller';
 
 @Module({
   controllers: [
@@ -54,6 +55,7 @@ import { ZendegiBaAyehaController } from './zendegi-ba-ayeha/zendegi-ba-ayeha.co
     CoachCategoryController,
     CourseEpisodeController,
     ZendegiBaAyehaController,
+    CourseItemsController,
   ],
   providers: [
     AccessPermissionService,

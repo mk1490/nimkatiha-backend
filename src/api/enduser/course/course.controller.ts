@@ -93,18 +93,38 @@ export class CourseController extends BaseController {
     });
 
 
-    const courseItems = await this.prisma.course_episodes.findMany({
+    const courseItems = await this.prisma.course_items.findMany({
       where: {
         parentCourseId: item.id,
       },
+      orderBy: {
+        creationTime: 'asc',
+      },
     });
+
+
+    const courseChildren = await this.prisma.course_episodes.findMany({
+      where: {
+        parentCourseItemId: {
+          in: courseItems.map(f => f.id),
+        },
+      },
+    });
+
+
     return {
       ...item,
       items: courseItems.map(f => {
         return {
           id: f.id,
           title: f.title,
-          type: f.type,
+          children: courseChildren.filter(x => x.parentCourseItemId == f.id).map(courseChildItem => {
+            return {
+              id: courseChildItem.id,
+              title: courseChildItem.title,
+              type: courseChildItem.type,
+            };
+          }),
         };
       }),
     };

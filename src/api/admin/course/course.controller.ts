@@ -60,6 +60,7 @@ export class CourseController extends BaseController {
       data: {
         id,
         title: input.title,
+        content: input.content,
       },
     }));
     transactions.push(this.prisma.course_visibility_for.createMany({
@@ -87,6 +88,7 @@ export class CourseController extends BaseController {
       },
       data: {
         title: input.title,
+        content: input.content,
       },
     }));
 
