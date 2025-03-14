@@ -17,5 +17,5 @@ export class CreateUpdateQuestionItemDto {
   correctAnswer: number;
 
   @ApiProperty()
-  score: number;
+  score: number = 0;
 }

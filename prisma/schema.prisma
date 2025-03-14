@@ -286,14 +286,14 @@ model question_bank {
   creationTime DateTime @default(now())
 }
 
-// model question_bank_questions {
-model test_questions {
+model question_bank_questions {
+  // model test_questions {
   id              String   @id() @default(uuid())
   parentId        String
   // parentQuestionBankId String
   questionTitle   String   @db.LongText
   questionType    Int
-  questionScore   Int
+  questionScore   Int?
   correctAnswerId String?
   creationTime    DateTime @default(now())
 }

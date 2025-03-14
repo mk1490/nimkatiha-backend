@@ -42,7 +42,7 @@ import { ConfigModule } from '@nestjs/config';
     ]),
     ServeStaticModule.forRoot({
       serveRoot: '/api/public-files',
-      rootPath: join(homedir(), '/dastafarinan/public'),
+      rootPath: join(homedir(), '/nimkatiha/public'),
       exclude: ['/api*'],
     }),
     ConfigModule.forRoot({

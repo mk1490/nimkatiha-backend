@@ -18,15 +18,16 @@ export class CourseEpisodeController extends BaseController {
 
   @Get('initialize')
   async initialize() {
-    const testTemplates = await this.prisma.question_bank.findMany();
+    const questionsBank = await this.prisma.question_bank.findMany();
     const prerequisites = await this.prisma.course_episodes.findMany();
     return {
       types: [
         this.helper.getKeyValue('ویدئو', 1),
         this.helper.getKeyValue('آزمون', 2),
         this.helper.getKeyValue('فایل پیوست', 3),
+        this.helper.getKeyValue('تکلیف', 4),
       ],
-      testBanks: testTemplates.map(f => {
+      questionsBank: questionsBank.map(f => {
         return this.helper.getKeyValue(f.title, f.id);
       }),
       prerequisites: prerequisites.map(f => {
@@ -58,7 +59,18 @@ export class CourseEpisodeController extends BaseController {
 
     mkdirp.sync(dir);
 
-    writeFileSync(dir + '/' + file.originalname, file.buffer);
+    const fileName = file.originalname;
+
+    writeFileSync(dir + '/' + fileName, file.buffer);
+
+    await this.prisma.course_episodes.update({
+      where: {
+        id: parentId,
+      },
+      data: {
+        metaData: fileName,
+      },
+    });
   }
 
 

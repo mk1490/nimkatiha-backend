@@ -13,7 +13,7 @@ export class TestQuestionController extends BaseController {
   @Get('/initialize')
   async initialize() {
     return {
-
+      // types: this.questionTypes,
     };
   }
 

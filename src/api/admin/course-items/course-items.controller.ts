@@ -16,6 +16,9 @@ export class CourseItemsController extends BaseController {
       where: {
         parentCourseId: parentId,
       },
+      orderBy: {
+        creationTime: 'asc',
+      },
     });
   }
 

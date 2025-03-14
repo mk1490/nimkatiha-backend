@@ -109,6 +109,9 @@ export class CourseController extends BaseController {
           in: courseItems.map(f => f.id),
         },
       },
+      orderBy: {
+        creationTime: 'asc',
+      },
     });
 
 
@@ -119,11 +122,16 @@ export class CourseController extends BaseController {
           id: f.id,
           title: f.title,
           children: courseChildren.filter(x => x.parentCourseItemId == f.id).map(courseChildItem => {
-            return {
+            const type = courseChildItem.type;
+            let payload: any = {
               id: courseChildItem.id,
               title: courseChildItem.title,
-              type: courseChildItem.type,
+              type,
             };
+            if (type == 3) {
+              payload.url = `/api/public-files/course-episode-attachments/${courseChildItem.id}/${courseChildItem.metaData}`;
+            }
+            return payload;
           }),
         };
       }),
