@@ -23,6 +23,9 @@ async function bootstrap() {
     excelBackup: () => {
       return join(global.directories.public, 'excel-backup');
     },
+    courseEpisodeAttachments: (courseEpisodeAttachmentId) => {
+      return join(global.directories.public, 'course-episode-attachments', courseEpisodeAttachmentId);
+    },
   };
 
   const app = await NestFactory.create(AppModule);

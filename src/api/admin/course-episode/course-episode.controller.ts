@@ -1,6 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateCourseEpisodeDto } from './dto/create-update-course-episode-dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage, memoryStorage } from 'multer';
+import { extname, join } from 'path';
+import { homedir } from 'os';
+import e from 'express';
+import { writeFileSync } from 'fs';
+import { mkdirp } from 'mkdirp';
 
 @Controller('course-episode')
 export class CourseEpisodeController extends BaseController {
@@ -38,6 +45,23 @@ export class CourseEpisodeController extends BaseController {
   }
 
 
+  @Post('/upload-file/:parentId')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+    }),
+  )
+  async uploadFile(
+    @Param('parentId') parentId,
+    @UploadedFile() file: Express.Multer.File) {
+    const dir = global.directories.courseEpisodeAttachments(parentId);
+
+    mkdirp.sync(dir);
+
+    writeFileSync(dir + '/' + file.originalname, file.buffer);
+  }
+
+
   @Post()
   async create(@Body() input: CreateUpdateCourseEpisodeDto) {
     const transactions = [];
@@ -51,7 +75,7 @@ export class CourseEpisodeController extends BaseController {
         type: input.type,
         parentCourseItemId: input.parentId,
         prerequisites: input.prerequisites,
-        metaData: input.metaData,
+        metaData: input.metaData || '',
       },
     }));
 
@@ -77,7 +101,7 @@ export class CourseEpisodeController extends BaseController {
         title: input.title,
         type: input.type,
         prerequisites: input.prerequisites,
-        metaData: input.metaData,
+        metaData: input.metaData || '',
       },
     }));
 
