@@ -57,38 +57,55 @@ export class QuestionBankController extends BaseController {
     let answers = [];
     let correctAnswer = null;
     for (let i = 0; i < 4; i++) {
-      answers.push(this.helper.generateUuid());
+      answers.push({
+        id: this.helper.generateUuid(),
+        label: input.items[i].title,
+      });
       if (i == input.correctAnswer) {
-        correctAnswer = answers[i];
+        correctAnswer = answers[i].id;
       }
     }
 
 
+    const transactions = [];
     if (id) {
-      await this.prisma.question_bank_questions.update({
+      transactions.push(this.prisma.question_bank_questions.update({
         where: {
           id,
         },
         data: {
           parentId: input.parentQuestionBankId,
-          questionScore: input.score,
+          questionScore: Number(input.score),
           questionType: input.type,
           questionTitle: input.title,
           correctAnswerId: correctAnswer,
         },
-      });
+      }));
     } else {
-      await this.prisma.question_bank_questions.create({
+      const id = this.helper.generateUuid();
+      transactions.push(this.prisma.question_bank_questions.create({
         data: {
+          id,
           parentId: input.parentQuestionBankId,
-          questionScore: input.score,
+          questionScore: Number(input.score),
           questionType: input.type,
           questionTitle: input.title,
           correctAnswerId: correctAnswer,
         },
-      });
+      }));
+      transactions.push(this.prisma.test_question_answer_items.createMany({
+        data: answers.map((f, i) => {
+          return {
+            parentTestQuestionId: id,
+            label: f.label,
+            value: f.id,
+          };
+        }),
+      }));
     }
 
+
+    await this.prisma.$transaction(transactions);
   }
 
 

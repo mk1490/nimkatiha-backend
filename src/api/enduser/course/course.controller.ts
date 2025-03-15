@@ -1,9 +1,10 @@
-import { Controller, Get, NotAcceptableException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotAcceptableException, Param, Post } from '@nestjs/common';
 import { BaseController } from '../../../base/base-controller';
 import axios from 'axios';
 import { to } from 'await-to-js';
 import { CurrentMember } from '../../../base/decorators/current-member.decorator';
 import { CurrentCoach } from '../../../base/decorators/current-coach-decorator';
+import { TestStatuses } from '../../../base/enums/TestStatuses';
 
 @Controller('course')
 export class CourseController extends BaseController {
@@ -84,6 +85,43 @@ export class CourseController extends BaseController {
   }
 
 
+  @Get('/prepare-test/:questionId')
+  async prepareTest(
+    @Param('questionId') questionId,
+    @CurrentCoach() currentCoach) {
+    const questionBankItem = await this.prisma.question_bank.findFirst({
+      where: {
+        id: questionId,
+      },
+    });
+
+    const items = await this.prisma.question_bank_questions.findMany({
+      where: {
+        parentId: questionBankItem.id,
+      },
+    });
+
+    const answerItems = await this.prisma.test_question_answer_items.findMany();
+
+    return {
+      ...questionBankItem,
+      items: items.map(f => {
+        return {
+          id: f.id,
+          questionTitle: f.questionTitle,
+          type: f.questionType,
+          answers: answerItems.filter(x => x.parentTestQuestionId == f.id).map(answerItem => {
+            return {
+              id: answerItem.id,
+              value: answerItem.value,
+              label: answerItem.label,
+            };
+          }),
+        };
+      }),
+    };
+  }
+
   @Get('/:id')
   async getDetails(@Param('id') id: string) {
     const item = await this.prisma.course.findFirst({
@@ -130,12 +168,47 @@ export class CourseController extends BaseController {
             };
             if (type == 3) {
               payload.url = `/api/public-files/course-episode-attachments/${courseChildItem.id}/${courseChildItem.metaData}`;
+            } else if (type == 2) {
+              payload.questionId = courseChildItem.metaData;
             }
             return payload;
           }),
         };
       }),
     };
+  }
+
+  @Post('/test-complete')
+  async testComplete(
+    @CurrentCoach() currentCoach,
+    @Body('items') items,
+    @Body('questionId') questionId,
+  ) {
+    const transactions = [];
+
+
+    const id = this.helper.generateUuid();
+
+    transactions.push(this.prisma.member_answered_tests.create({
+      data: {
+        id,
+        userId: currentCoach.id,
+        status: TestStatuses.Success,
+        endTime: new Date(),
+        publishedTestItemId: questionId,
+      },
+    }));
+    transactions.push(this.prisma.answered_test_items.createMany({
+      data: Object.keys(items).map(questionItem => {
+        return {
+          questionId: questionItem,
+          answerContent: items[questionItem],
+          parentAnswerItemId: id,
+        };
+      }),
+    }));
+
+    await this.prisma.$transaction(transactions);
   }
 
 

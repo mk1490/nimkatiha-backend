@@ -19,6 +19,7 @@ import { homedir } from 'os';
 import { AccessPermissionService } from './service/access-permission/access-permission.service';
 import { NotificationService } from './service/notification/notification.service';
 import { ConfigModule } from '@nestjs/config';
+import { ReportModule } from './api/admin/report/report.module';
 
 @Module({
   imports: [
@@ -34,6 +35,12 @@ import { ConfigModule } from '@nestjs/config';
       {
         path: 'admin',
         module: AdminModule,
+        children: [
+          {
+            path: 'report',
+            module: ReportModule,
+          },
+        ],
       },
       {
         path: 'enduser',

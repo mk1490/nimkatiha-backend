@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user/user.controller';
 import { AccessPermissionService } from '../../service/access-permission/access-permission.service';
 import { AccessPermissionController } from './access-permission/access-permission.controller';
-import { HomeItemsImageSliderController } from './home-items-image-slider/home-items-image-slider.controller';
 import { FinancialDepositController } from './financial-deposit/financial-deposit.controller';
 import { RejectionTemplateController } from './rejection-template/rejection-template.controller';
 import { SettingsController } from './settings/settings.controller';
@@ -29,12 +28,12 @@ import { CoachCategoryController } from './coach-category/coach-category.control
 import { CourseEpisodeController } from './course-episode/course-episode.controller';
 import { ZendegiBaAyehaController } from './zendegi-ba-ayeha/zendegi-ba-ayeha.controller';
 import { CourseItemsController } from './course-items/course-items.controller';
+import { ReportModule } from './report/report.module';
 
 @Module({
   controllers: [
     UserController,
     AccessPermissionController,
-    HomeItemsImageSliderController,
     FinancialDepositController,
     RejectionTemplateController,
     SettingsController,
@@ -65,6 +64,7 @@ import { CourseItemsController } from './course-items/course-items.controller';
     WorkflowService,
     NotificationService,
   ],
+  imports: [ReportModule],
 })
 export class AdminModule {
 }
