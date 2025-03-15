@@ -399,6 +399,13 @@ model course_visibility_for {
   creationTime    DateTime @default(now())
 }
 
+model course_specifications {
+  id           String   @id() @default(uuid())
+  title        String
+  value        String
+  creationTime DateTime @default(now())
+}
+
 model course_items {
   id             String   @id() @default(uuid())
   title          String

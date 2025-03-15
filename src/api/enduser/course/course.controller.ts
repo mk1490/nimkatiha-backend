@@ -65,17 +65,7 @@ export class CourseController extends BaseController {
 
 
     if (item) {
-      if (item.type == 1) {
-        const [err, result] = await to(axios.get(item.metaData));
-        if (!err) {
-          const sourceItem = result.data.source.find(x => x.type == 'application/x-mpegURL');
-          return {
-            id: item.id,
-            status: ovserveItem ? 1 : 0,
-            videoUrl: sourceItem.src,
-          };
-        }
-      }
+
 
     }
 
@@ -130,6 +120,8 @@ export class CourseController extends BaseController {
       },
     });
 
+    const courseSpecifications = await this.prisma.course
+
 
     const courseItems = await this.prisma.course_items.findMany({
       where: {
@@ -155,26 +147,35 @@ export class CourseController extends BaseController {
 
     return {
       ...item,
-      items: courseItems.map(f => {
+      items: await Promise.all(courseItems.map(async f => {
         return {
           id: f.id,
           title: f.title,
-          children: courseChildren.filter(x => x.parentCourseItemId == f.id).map(courseChildItem => {
+          children: await Promise.all(courseChildren.filter(x => x.parentCourseItemId == f.id).map(async courseChildItem => {
             const type = courseChildItem.type;
             let payload: any = {
               id: courseChildItem.id,
               title: courseChildItem.title,
               type,
             };
+            if (type == 1) {
+              const [err, result] = await to(axios.get(courseChildItem.metaData));
+              if (!err) {
+                const sourceItem = result.data.source.find(x => x.type == 'application/x-mpegURL');
+                payload.status = 1;
+                payload.videoUrl = sourceItem.src;
+              }
+            }
+
             if (type == 3) {
               payload.url = `/api/public-files/course-episode-attachments/${courseChildItem.id}/${courseChildItem.metaData}`;
             } else if (type == 2) {
               payload.questionId = courseChildItem.metaData;
             }
             return payload;
-          }),
+          })),
         };
-      }),
+      })),
     };
   }
 
