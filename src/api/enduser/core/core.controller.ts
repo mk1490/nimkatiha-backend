@@ -80,7 +80,15 @@ export class CoreController extends BaseController {
       preText: testTemplateItem.preText,
       afterText: testTemplateItem.afterText,
       mobileNumber: memberItem ? memberItem.mobileNumber : '',
-
+      imageSliders: [
+        { imageUrl: `/api/public-files/survey/sliders/1.jpg` },
+        { imageUrl: `/api/public-files/survey/sliders/2.jpg` },
+        { imageUrl: `/api/public-files/survey/sliders/3.jpg` },
+        { imageUrl: `/api/public-files/survey/sliders/4.jpg` },
+        { imageUrl: `/api/public-files/survey/sliders/5.jpg` },
+        { imageUrl: `/api/public-files/survey/sliders/6.jpg` },
+      ],
+      backgroundMusic: '',
       levels: levels.map(f => {
         return {
           title: f.levelTitle,
