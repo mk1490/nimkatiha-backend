@@ -88,7 +88,7 @@ export class CoreController extends BaseController {
         { imageUrl: `/api/public-files/survey/sliders/5.jpg` },
         { imageUrl: `/api/public-files/survey/sliders/6.jpg` },
       ],
-      backgroundMusic: '',
+      backgroundMusic: '/api/public-files/survey/background-music/bg-music.mp3',
       levels: levels.map(f => {
         return {
           title: f.levelTitle,
