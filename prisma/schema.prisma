@@ -252,11 +252,12 @@ model form_template_selection_patterns {
 }
 
 model form_template_selection_pattern_items {
-  id        String  @id() @default(uuid())
-  text      String
-  value     String
-  parentId  String
-  creatorId String?
+  id           String   @id() @default(uuid())
+  text         String
+  value        String
+  parentId     String
+  creatorId    String?
+  creationTime DateTime @default(now())
 }
 
 model answer_sheets {

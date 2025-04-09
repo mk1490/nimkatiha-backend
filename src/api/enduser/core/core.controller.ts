@@ -67,7 +67,11 @@ export class CoreController extends BaseController {
       },
     });
 
-    const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany();
+    const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany({
+      orderBy:{
+        creationTime: 'asc'
+      }
+    });
 
 
     const cityItems = await this.coreService.cityItems();
