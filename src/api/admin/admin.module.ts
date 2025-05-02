@@ -29,6 +29,7 @@ import { CourseEpisodeController } from './course-episode/course-episode.control
 import { ZendegiBaAyehaController } from './zendegi-ba-ayeha/zendegi-ba-ayeha.controller';
 import { CourseItemsController } from './course-items/course-items.controller';
 import { ReportModule } from './report/report.module';
+import { CoreService } from '../../service/core/core.service';
 
 @Module({
   controllers: [
@@ -63,6 +64,7 @@ import { ReportModule } from './report/report.module';
     SmsService,
     WorkflowService,
     NotificationService,
+    CoreService,
   ],
   imports: [ReportModule],
 })

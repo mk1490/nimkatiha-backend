@@ -2,30 +2,20 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { BaseController } from '../../../base/base-controller';
 import { CreateUpdateFormTemplateItemDto } from './dto/create-update-form-template-item-dto';
 import { FormInputTypes } from '../../../base/enums/formInputTypes';
+import { CoreService } from '../../../service/core/core.service';
 
 @Controller('form-template-items')
 export class FormTemplateItemsController extends BaseController {
 
 
-  constructor() {
+  constructor(private readonly coreService: CoreService) {
     super();
   }
 
 
   @Get('/initialize')
   async initialize() {
-    const formTypes = [
-      this.helper.getKeyValue('متن تک خطی', FormInputTypes.SingleTextInput),
-      this.helper.getKeyValue('متن چند خطی', FormInputTypes.MultipleTextInput),
-      this.helper.getKeyValue('عدد', FormInputTypes.Number),
-      this.helper.getKeyValue('شهرستان', FormInputTypes.City),
-      this.helper.getKeyValue('تک انتخابی (رادیو باتن)', FormInputTypes.RadioButton),
-      this.helper.getKeyValue('تک انتخابی (Selection Box)', FormInputTypes.SingleSelectionBox),
-      this.helper.getKeyValue('چند انتخابی (Selection Box)', FormInputTypes.MultipleSelectionBox),
-      this.helper.getKeyValue('چک باکس', FormInputTypes.Checkbox),
-      this.helper.getKeyValue('تاریخ', FormInputTypes.DatePicker),
-      // this.helper.getKeyValue('ساعت', FormInputTypes.TimePicker),
-    ];
+    const formTypes = this.coreService.formTypes;
 
     const patternItems = await this.prisma.form_template_selection_pattern_items.findMany();
 
@@ -109,6 +99,87 @@ export class FormTemplateItemsController extends BaseController {
 
   }
 
+
+  @Post('/duplicate/:id')
+  async duplicate(@Param('id') id: string
+  ) {
+    const item = await this.prisma.form_template_items.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+
+
+    const lastOrderItem = await this.prisma.form_template_items.findFirst({
+      where:{
+        parentId: item.id,
+      },
+      orderBy: {
+        order: 'desc'
+      }
+    })
+
+
+
+    const transactions = []
+
+
+    const formTemplateItemId = this.helper.generateUuid();
+
+    transactions.push(this.prisma.form_template_items.create({
+      data:{
+        id: formTemplateItemId,
+        label: 'کپی از ' + item.label,
+        key: this.getKey(item.type),
+        parentId: item.parentId,
+        order: lastOrderItem.order + 1,
+        isRequired: item.isRequired,
+        visibilityCondition: item.visibilityCondition,
+        type: item.type,
+        size: item.type,
+        minimum: item.minimum,
+        maximum: item.maximum,
+        metaData: item.metaData,
+        visibilityConditionValue: item.visibilityConditionValue,
+        creatorId: item.creatorId,
+      }
+    }))
+
+
+
+    if ([
+      FormInputTypes.RadioButton,
+      FormInputTypes.SingleSelectionBox,
+      FormInputTypes.MultipleSelectionBox,
+      FormInputTypes.Checkbox,
+    ].includes(item.type)) {
+
+      const selectionPatternItems = await this.prisma.form_template_selection_pattern_items.findMany({
+        where:{
+          parentId: item.id,
+        }
+      })
+
+      transactions.push(this.prisma.form_template_selection_pattern_items.createMany({
+        data: selectionPatternItems.map((f, i) => {
+          return {
+            text: f.text,
+            value: i.toString(),
+            parentId: formTemplateItemId,
+          };
+        }),
+      }));
+    }
+
+    await this.prisma.$transaction(transactions);
+
+    return await this.prisma.form_template_items.findFirst({
+      where:{
+        id: formTemplateItemId,
+      }
+    })
+  }
 
   @Post()
   async create(@Body() input: CreateUpdateFormTemplateItemDto) {

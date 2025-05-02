@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../base/base-service';
+import { FormInputTypes } from '../../base/enums/formInputTypes';
 
 @Injectable()
 export class CoreService extends BaseService {
@@ -193,6 +194,22 @@ export class CoreService extends BaseService {
       educationGrades: this.educationGrades,
       schoolGrades: this.schoolGrades,
     };
+  }
+
+
+  get formTypes(){
+    return [
+      this.helper.getKeyValue('متن تک خطی', FormInputTypes.SingleTextInput),
+      this.helper.getKeyValue('متن چند خطی', FormInputTypes.MultipleTextInput),
+      this.helper.getKeyValue('عدد', FormInputTypes.Number),
+      this.helper.getKeyValue('شهرستان', FormInputTypes.City),
+      this.helper.getKeyValue('تک انتخابی (رادیو باتن)', FormInputTypes.RadioButton),
+      this.helper.getKeyValue('تک انتخابی (Selection Box)', FormInputTypes.SingleSelectionBox),
+      this.helper.getKeyValue('چند انتخابی (Selection Box)', FormInputTypes.MultipleSelectionBox),
+      this.helper.getKeyValue('چک باکس', FormInputTypes.Checkbox),
+      this.helper.getKeyValue('تاریخ', FormInputTypes.DatePicker),
+      // this.helper.getKeyValue('ساعت', FormInputTypes.TimePicker),
+    ]
   }
 
 }
